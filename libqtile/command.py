@@ -31,7 +31,10 @@ from libqtile.lazy import LazyCommandInterface
 class _LazyTree(InteractiveCommandClient):
     def __getattr__(self, name: str) -> InteractiveCommandClient:
         """Get the child element of the currently selected object"""
-        warnings.warn("libqtile.command.lazy is deprecated, use libqtile.lazy.lazy", DeprecationWarning)
+        warnings.warn(
+            "libqtile.command.lazy is deprecated, use libqtile.lazy.lazy",
+            DeprecationWarning,
+        )
         return super().__getattr__(name)
 
 

@@ -35,9 +35,9 @@ class SelectError(Exception):
     """Error raised in resolving a command graph object"""
 
     def __init__(self, err_string: str, name: str, selectors: List[SelectorType]):
-        super().__init__("{}, name: {}, selectors: {}".format(err_string,
-                                                              name,
-                                                              selectors))
+        super().__init__(
+            "{}, name: {}, selectors: {}".format(err_string, name, selectors)
+        )
         self.name = name
         self.selectors = selectors
 

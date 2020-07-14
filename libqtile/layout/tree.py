@@ -87,9 +87,7 @@ class TreeNode:
     def add_superscript(self, title):
         """Prepend superscript denoting the number of hidden children"""
         if not self.expanded and self.children:
-            return "{:d}".format(
-                len(self.children)
-            ).translate(to_superscript) + title
+            return "{:d}".format(len(self.children)).translate(to_superscript) + title
         return title
 
     def get_first_window(self):
@@ -223,23 +221,14 @@ class Section(TreeNode):
         del layout._layout.width  # no centering
         # draw a horizontal line above the section
         layout._drawer.draw_hbar(
-            layout.section_fg,
-            0,
-            layout.panel_width,
-            top,
-            linewidth=1
+            layout.section_fg, 0, layout.panel_width, top, linewidth=1
         )
         # draw the section title
         layout._layout.font_size = layout.section_fontsize
         layout._layout.text = self.add_superscript(self.title)
         layout._layout.colour = layout.section_fg
-        layout._layout.draw(
-            x=layout.section_left,
-            y=top + layout.section_top
-        )
-        top += layout._layout.height + \
-            layout.section_top + \
-            layout.section_padding
+        layout._layout.draw(x=layout.section_left, y=top + layout.section_top)
+        top += layout._layout.height + layout.section_top + layout.section_padding
 
         # run the TreeNode draw to draw children (if expanded)
         top = super().draw(layout, top, level)
@@ -270,10 +259,7 @@ class Window(TreeNode):
         layout._layout.width = layout.panel_width - left
         # get a text frame from the above
         framed = layout._layout.framed(
-            layout.border_width,
-            bg,
-            layout.padding_x,
-            layout.padding_y
+            layout.border_width, bg, layout.padding_x, layout.padding_y
         )
         # draw the text frame at the given point
         framed.draw_fill(left, top)
@@ -455,15 +441,11 @@ class TreeTab(Layout):
         del self._nodes[win]
         self.draw_panel()
 
-    def _create_panel(self):
+    def _create_panel(self, screen):
         self._panel = window.Internal.create(
-            self.group.qtile,
-            0,
-            0,
-            self.panel_width,
-            100
+            self.group.qtile, screen.x, screen.y, self.panel_width, 100
         )
-        self._create_drawer()
+        self._create_drawer(screen)
         self._panel.handle_Expose = self._handle_Expose
         self._panel.handle_ButtonPress = self._handle_ButtonPress
         self.group.qtile.windows_map[self._panel.window.wid] = self._panel
@@ -487,12 +469,7 @@ class TreeTab(Layout):
 
     def configure(self, client, screen):
         if self._nodes and client is self._focused:
-            client.place(
-                screen.x, screen.y,
-                screen.width, screen.height,
-                0,
-                None
-            )
+            client.place(screen.x, screen.y, screen.width, screen.height, 0, None)
             client.unhide()
         else:
             client.hide()
@@ -503,7 +480,6 @@ class TreeTab(Layout):
             self._drawer.finalize()
 
     def info(self):
-
         def show_section_tree(root):
             '''Show a section tree in a nested list, whose every element has the form: `[root, [subtrees]]`.
 
@@ -547,7 +523,7 @@ class TreeTab(Layout):
 
     def show(self, screen):
         if not self._panel:
-            self._create_panel()
+            self._create_panel(screen)
         panel, body = screen.hsplit(self.panel_width)
         self._resize_panel(panel)
         self._panel.unhide()
@@ -714,22 +690,14 @@ class TreeTab(Layout):
         self.panel_width -= 10
         self.group.layout_all()
 
-    def _create_drawer(self):
+    def _create_drawer(self, rect):
         if self._drawer is None:
             self._drawer = drawer.Drawer(
-                self.group.qtile,
-                self._panel.window.wid,
-                self.panel_width,
-                self.group.screen.dheight
+                self.group.qtile, self._panel.window.wid, self.panel_width, rect.height
             )
         self._drawer.clear(self.bg_color)
         self._layout = self._drawer.textlayout(
-            "",
-            "ffffff",
-            self.font,
-            self.fontsize,
-            self.fontshadow,
-            wrap=False
+            "", "ffffff", self.font, self.fontsize, self.fontshadow, wrap=False
         )
 
     def layout(self, windows, screen):
@@ -739,11 +707,6 @@ class TreeTab(Layout):
 
     def _resize_panel(self, rect):
         if self._panel:
-            self._panel.place(
-                rect.x, rect.y,
-                rect.width, rect.height,
-                0,
-                None
-            )
-            self._create_drawer()
+            self._panel.place(rect.x, rect.y, rect.width, rect.height, 0, None)
+            self._create_drawer(rect)
             self.draw_panel()

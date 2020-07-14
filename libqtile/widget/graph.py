@@ -113,8 +113,7 @@ class _Graph(base._Widget):
             self.drawer.ctx.line_to(x + index * step, y - self.val(val))
         self.drawer.ctx.stroke_preserve()
         self.drawer.ctx.line_to(
-            x + (len(values) - 1) * step,
-            y - 1 + self.line_width / 2.0
+            x + (len(values) - 1) * step, y - 1 + self.line_width / 2.0
         )
         self.drawer.ctx.line_to(x, y - 1 + self.line_width / 2.0)
         self.drawer.set_source_rgb(self.fill_color)
@@ -167,7 +166,7 @@ class _Graph(base._Widget):
             self.lag_cycles = 1
 
         self.values = ([value] * min(self.samples, self.lag_cycles)) + self.values
-        self.values = self.values[:self.samples]
+        self.values = self.values[: self.samples]
 
         if not self.fixed_upper_bound:
             self.maxvalue = max(self.values)
@@ -188,6 +187,7 @@ class _Graph(base._Widget):
 
 class CPUGraph(_Graph):
     """Display CPU usage graph"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("core", "all", "Which core to show (all/0/1/2/...)"),
@@ -236,6 +236,7 @@ class CPUGraph(_Graph):
 
 class MemoryGraph(_Graph):
     """Displays a memory usage graph"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     fixed_upper_bound = True
 
@@ -258,13 +259,12 @@ class MemoryGraph(_Graph):
 
     def update_graph(self):
         val = self._getvalues()
-        self.push(
-            val['MemTotal'] - val['MemFree'] - val['Buffers'] - val['Cached']
-        )
+        self.push(val['MemTotal'] - val['MemFree'] - val['Buffers'] - val['Cached'])
 
 
 class SwapGraph(_Graph):
     """Display a swap info graph"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     fixed_upper_bound = True
 
@@ -296,13 +296,10 @@ class SwapGraph(_Graph):
 
 class NetGraph(_Graph):
     """Display a network usage graph"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
-        (
-            "interface",
-            "auto",
-            "Interface to display info for ('auto' for detection)"
-        ),
+        ("interface", "auto", "Interface to display info for ('auto' for detection)"),
         ("bandwidth_type", "down", "down(load)/up(load)"),
     ]
 
@@ -355,11 +352,12 @@ class NetGraph(_Graph):
 
 class HDDGraph(_Graph):
     """Display HDD free or used space graph"""
+
     fixed_upper_bound = True
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("path", "/", "Partition mount point."),
-        ("space_type", "used", "free/used")
+        ("space_type", "used", "free/used"),
     ]
 
     def __init__(self, **config):
@@ -389,17 +387,14 @@ class HDDBusyGraph(_Graph):
     based on ``io_ticks``'s value.  See
     https://www.kernel.org/doc/Documentation/block/stat.txt
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
-    defaults = [
-        ("device", "sda", "Block device to display info for")
-    ]
+    defaults = [("device", "sda", "Block device to display info for")]
 
     def __init__(self, **config):
         _Graph.__init__(self, **config)
         self.add_defaults(HDDBusyGraph.defaults)
-        self.path = '/sys/block/{dev}/stat'.format(
-            dev=self.device
-        )
+        self.path = '/sys/block/{dev}/stat'.format(dev=self.device)
         self._prev = 0
 
     def _get_values(self):

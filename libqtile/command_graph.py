@@ -57,7 +57,9 @@ class CommandGraphNode(metaclass=abc.ABCMeta):
     def children(self) -> List[str]:
         """The child objects that are contained within this object"""
 
-    def navigate(self, name: str, selector: Optional[Union[str, int]]) -> "CommandGraphNode":
+    def navigate(
+        self, name: str, selector: Optional[Union[str, int]]
+    ) -> "CommandGraphNode":
         """Navigate from the current node to the specified child"""
         if name in self.children:
             return _COMMAND_GRAPH_MAP[name](selector, self)
@@ -133,7 +135,9 @@ class CommandGraphRoot(CommandGraphNode):
 class CommandGraphObject(CommandGraphNode, metaclass=abc.ABCMeta):
     """An object in the command graph that contains a collection of objects"""
 
-    def __init__(self, selector: Optional[Union[str, int]], parent: CommandGraphNode) -> None:
+    def __init__(
+        self, selector: Optional[Union[str, int]], parent: CommandGraphNode
+    ) -> None:
         """A container object in the command graph
 
         Parameters

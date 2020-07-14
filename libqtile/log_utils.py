@@ -38,6 +38,7 @@ logger = getLogger(__package__)
 
 class ColorFormatter(Formatter):
     """Logging formatter adding console colors to the output."""
+
     black, red, green, yellow, blue, magenta, cyan, white = range(8)
     colors = {
         'WARNING': yellow,
@@ -51,7 +52,7 @@ class ColorFormatter(Formatter):
         'BLUE': blue,
         'MAGENTA': magenta,
         'CYAN': cyan,
-        'WHITE': white
+        'WHITE': white,
     }
     reset_seq = '\033[0m'
     color_seq = '\033[%dm'
@@ -61,19 +62,28 @@ class ColorFormatter(Formatter):
         """Format the record with colors."""
         color = self.color_seq % (30 + self.colors[record.levelname])
         message = Formatter.format(self, record)
-        message = message.replace('$RESET', self.reset_seq)\
-            .replace('$BOLD', self.bold_seq)\
+        message = (
+            message.replace('$RESET', self.reset_seq)
+            .replace('$BOLD', self.bold_seq)
             .replace('$COLOR', color)
+        )
         for color, value in self.colors.items():
-            message = message.replace(
-                '$' + color, self.color_seq % (value + 30))\
-                .replace('$BG' + color, self.color_seq % (value + 40))\
+            message = (
+                message.replace('$' + color, self.color_seq % (value + 30))
+                .replace('$BG' + color, self.color_seq % (value + 40))
                 .replace('$BG-' + color, self.color_seq % (value + 40))
+            )
         return message + self.reset_seq
 
 
-def init_log(log_level=WARNING, log_path=True, log_truncate=False,
-             log_size=10000000, log_numbackups=1, log_color=True):
+def init_log(
+    log_level=WARNING,
+    log_path=True,
+    log_truncate=False,
+    log_size=10000000,
+    log_numbackups=1,
+    log_color=True,
+):
     for handler in logger.handlers:
         logger.removeHandler(handler)
     formatter = Formatter(
@@ -111,9 +121,7 @@ def init_log(log_level=WARNING, log_path=True, log_truncate=False,
             with open(log_path, "w"):
                 pass
         file_handler = RotatingFileHandler(
-            log_path,
-            maxBytes=log_size,
-            backupCount=log_numbackups
+            log_path, maxBytes=log_size, backupCount=log_numbackups
         )
 
         file_handler.setFormatter(formatter)

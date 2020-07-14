@@ -26,7 +26,13 @@ from tempfile import TemporaryDirectory
 from jupyter_client.kernelspec import install_kernel_spec
 
 kernel_json = {
-    "argv": [sys.executable, "-m", "libqtile.interactive.iqshell_kernel", "-f", "{connection_file}"],
+    "argv": [
+        sys.executable,
+        "-m",
+        "libqtile.interactive.iqshell_kernel",
+        "-f",
+        "{connection_file}",
+    ],
     "display_name": "iqshell",
     "language": "qshell",
 }

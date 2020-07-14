@@ -30,6 +30,7 @@ from libqtile.widget import base
 
 class Canto(base.ThreadedPollText):
     """Display RSS feeds updates using the canto console reader"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("fetch", False, "Whether to fetch new items on update"),
@@ -54,7 +55,11 @@ class Canto(base.ThreadedPollText):
         else:
             if self.fetch:
                 call(["canto", "-u"])
-            return "".join([self.one_format.format(
-                name=feed,
-                number=self.call_process(["canto", "-n", feed])[:-1]
-            ) for feed in self.feeds])
+            return "".join(
+                [
+                    self.one_format.format(
+                        name=feed, number=self.call_process(["canto", "-n", feed])[:-1]
+                    )
+                    for feed in self.feeds
+                ]
+            )

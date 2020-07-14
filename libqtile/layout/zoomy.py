@@ -32,6 +32,7 @@ from libqtile.layout.base import _SimpleLayoutBase
 
 class Zoomy(_SimpleLayoutBase):
     """A layout with single active windows, and few other previews at the right"""
+
     defaults = [
         ("columnwidth", 150, "Width of the right column"),
         ("property_name", "ZOOM", "Property to set on zoomed window"),
@@ -52,13 +53,7 @@ class Zoomy(_SimpleLayoutBase):
         left, right = screen.hsplit(screen.width - self.columnwidth)
         if client is self.clients.current_client:
             client.place(
-                left.x,
-                left.y,
-                left.width,
-                left.height,
-                0,
-                None,
-                margin=self.margin,
+                left.x, left.y, left.width, left.height, 0, None, margin=self.margin,
             )
         else:
             h = right.width * left.height // left.width
@@ -91,20 +86,23 @@ class Zoomy(_SimpleLayoutBase):
         client.unhide()
 
     def focus(self, win):
-        if (self.clients.current_client and
-            self.property_name and
-            self.clients.current_client.window.get_property(
-                self.property_name, "UTF8_STRING") is not None):
+        if (
+            self.clients.current_client
+            and self.property_name
+            and self.clients.current_client.window.get_property(
+                self.property_name, "UTF8_STRING"
+            )
+            is not None
+        ):
 
             self.clients.current_client.window.set_property(
-                self.property_name,
-                self.property_small,
-                "UTF8_STRING", format=8)
+                self.property_name, self.property_small, "UTF8_STRING", format=8
+            )
         _SimpleLayoutBase.focus(self, win)
         if self.property_name:
-            win.window.set_property(self.property_name,
-                                    self.property_big,
-                                    "UTF8_STRING", format=8)
+            win.window.set_property(
+                self.property_name, self.property_big, "UTF8_STRING", format=8
+            )
 
     cmd_next = _SimpleLayoutBase.next
     cmd_down = _SimpleLayoutBase.next

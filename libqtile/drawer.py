@@ -303,13 +303,13 @@ class Drawer:
             the Y portion of the canvas to draw at the starting point.
         """
         self.qtile.conn.conn.core.CopyArea(
-            self.pixmap,
-            self.wid,
-            self.gc,
-            0, 0,  # srcx, srcy
-            offsetx, offsety,  # dstx, dsty
-            self.width if width is None else width,
-            self.height if height is None else height
+            src_drawable=self.pixmap,
+            dst_drawable=self.wid,
+            gc=self.gc,
+            src_x=0, src_y=0,
+            dst_x=offsetx, dst_y=offsety,
+            width=self.width if width is None else width,
+            height=self.height if height is None else height
         )
 
     def find_root_visual(self):

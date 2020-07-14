@@ -78,9 +78,7 @@ class PulseVolume(Volume):
         self.context = lib.pa_context_new(self.api, self.client_name)
         lib.pa_context_connect(self.context, ffi.NULL, 0, ffi.NULL)
         lib.pa_context_set_state_callback(
-            self.context,
-            lib.qtile_pa_context_changed,
-            self.handle
+            self.context, lib.qtile_pa_context_changed, self.handle
         )
 
     def on_connection_change(self, context):
@@ -109,21 +107,16 @@ class PulseVolume(Volume):
 
     def get_server_info(self):
         lib.pa_context_get_server_info(
-            self.context,
-            lib.qtile_on_server_info,
-            self.handle
+            self.context, lib.qtile_on_server_info, self.handle
         )
 
     def on_server_info(self, info):
-        self.default_sink_name = ffi.string(info.default_sink_name) \
-            .decode('utf-8')
+        self.default_sink_name = ffi.string(info.default_sink_name).decode('utf-8')
         self.timeout_add(0.1, self.get_sinks)
 
     def get_sinks(self):
         lib.pa_context_get_sink_info_list(
-            self.context,
-            lib.qtile_on_sink_info,
-            self.handle
+            self.context, lib.qtile_on_sink_info, self.handle
         )
 
     def on_sink_info(self, sink, eol):
@@ -146,16 +139,11 @@ class PulseVolume(Volume):
 
     def subscribe_to_sink_events(self):
         op = lib.pa_context_subscribe(
-            self.context,
-            lib.PA_SUBSCRIPTION_MASK_SINK,
-            ffi.NULL,
-            ffi.NULL,
+            self.context, lib.PA_SUBSCRIPTION_MASK_SINK, ffi.NULL, ffi.NULL,
         )
         self.wait_for_operation(op)
         lib.pa_context_set_subscribe_callback(
-            self.context,
-            lib.qtile_on_sink_update,
-            self.handle
+            self.context, lib.qtile_on_sink_update, self.handle
         )
         self._subscribed = True
 
@@ -176,11 +164,7 @@ class PulseVolume(Volume):
         # to wait a callback from pulseaudio
         self.default_sink['values'] = list(volume.values)
         op = lib.pa_context_set_sink_volume_by_index(
-            self.context,
-            self.default_sink['index'],
-            volume,
-            ffi.NULL,
-            ffi.NULL
+            self.context, self.default_sink['index'], volume, ffi.NULL, ffi.NULL
         )
         if op:
             self.wait_for_operation(op)
@@ -191,20 +175,22 @@ class PulseVolume(Volume):
             self.default_sink['index'],
             not self.default_sink['muted'],
             ffi.NULL,
-            ffi.NULL
+            ffi.NULL,
         )
         if op:
             self.wait_for_operation(op)
 
     def cmd_increase_volume(self, value=2):
         base = self.default_sink['base_volume']
-        volume = ffi.new('pa_cvolume *', {
-            'channels': self.default_sink['channels'],
-            'values': self.default_sink['values'],
-        })
+        volume = ffi.new(
+            'pa_cvolume *',
+            {
+                'channels': self.default_sink['channels'],
+                'values': self.default_sink['values'],
+            },
+        )
         lib.pa_cvolume_inc(
-            volume,
-            int(value * base / 100),
+            volume, int(value * base / 100),
         )
         # check that we dont go over 100% in case its set in config
         if self.limit_max_volume:
@@ -216,10 +202,13 @@ class PulseVolume(Volume):
         if not volume_level and max(self.default_sink['values']) == 0:
             # can't be lower than zero
             return
-        volume = ffi.new('pa_cvolume *', {
-            'channels': self.default_sink['channels'],
-            'values': self.default_sink['values'],
-        })
+        volume = ffi.new(
+            'pa_cvolume *',
+            {
+                'channels': self.default_sink['channels'],
+                'values': self.default_sink['values'],
+            },
+        )
         lib.pa_cvolume_dec(volume, volume_level)
         self.change_volume(volume)
 

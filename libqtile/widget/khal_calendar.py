@@ -59,13 +59,10 @@ class KhalCalendar(base.ThreadedPollText):
 
     .. _dateutil: https://pypi.org/project/python-dateutil/
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
-        (
-            'reminder_color',
-            'FF0000',
-            'color of calendar entries during reminder time'
-        ),
+        ('reminder_color', 'FF0000', 'color of calendar entries during reminder time'),
         ('foreground', 'FFFF33', 'default foreground color'),
         ('remindertime', 10, 'reminder time in minutes'),
         ('lookahead', 7, 'days to look ahead in the calendar'),
@@ -98,18 +95,24 @@ class KhalCalendar(base.ThreadedPollText):
             if output[i].strip() == '':
                 continue
             try:
-                starttime = dateutil.parser.parse(date + ' ' + output[i][:5],
-                                                  ignoretz=True)
-                endtime = dateutil.parser.parse(date + ' ' + output[i][6:11],
-                                                ignoretz=True)
+                starttime = dateutil.parser.parse(
+                    date + ' ' + output[i][:5], ignoretz=True
+                )
+                endtime = dateutil.parser.parse(
+                    date + ' ' + output[i][6:11], ignoretz=True
+                )
             except ValueError:
                 try:
                     if output[i] == 'Today:':
-                        date = str(now.month) + '/' + str(now.day) + '/' + \
-                            str(now.year)
+                        date = str(now.month) + '/' + str(now.day) + '/' + str(now.year)
                     elif output[i] == 'Tomorrow:':
-                        date = str(tomorrow.month) + '/' + str(tomorrow.day) + \
-                            '/' + str(tomorrow.year)
+                        date = (
+                            str(tomorrow.month)
+                            + '/'
+                            + str(tomorrow.day)
+                            + '/'
+                            + str(tomorrow.year)
+                        )
                     else:
                         dateutil.parser.parse(output[i])
                         date = output[i]
@@ -120,8 +123,7 @@ class KhalCalendar(base.ThreadedPollText):
                 data = date.replace(':', '') + ' ' + output[i]
                 break
             else:
-                data = 'No appointments in next ' + \
-                    str(self.lookahead) + ' days'
+                data = 'No appointments in next ' + str(self.lookahead) + ' days'
 
         # get rid of any garbage in appointment added by khal
         data = ''.join(filter(lambda x: x in string.printable, data))

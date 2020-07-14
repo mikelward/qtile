@@ -32,6 +32,7 @@ class Moc(base.ThreadPoolText):
 
     MOC (http://moc.daper.net) should be installed.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('play_color', '00ff00', 'Text colour when playing.'),
@@ -54,16 +55,12 @@ class Moc(base.ThreadPoolText):
             output = err.output.decode()
         if output.startswith("State"):
             output = output.splitlines()
-            info = {'State': "",
-                    'File': "",
-                    'SongTitle': "",
-                    'Artist': "",
-                    'Album': ""}
+            info = {'State': "", 'File': "", 'SongTitle': "", 'Artist': "", 'Album': ""}
 
             for line in output:
                 for data in info:
                     if data in line:
-                        info[data] = line[len(data) + 2:].strip()
+                        info[data] = line[len(data) + 2 :].strip()
                         break
             return info
 
@@ -101,7 +98,7 @@ class Moc(base.ThreadPoolText):
         if not self.status:
             return
         if len(text) > self.max_chars > 0:
-            text = text[:self.max_chars] + "…"
+            text = text[: self.max_chars] + "…"
         self.text = text
 
         if self.layout.width == old_width:

@@ -99,7 +99,9 @@ class CommandInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def has_item(self, node: CommandGraphNode, object_type: str, item: Union[str, int]) -> bool:
+    def has_item(
+        self, node: CommandGraphNode, object_type: str, item: Union[str, int]
+    ) -> bool:
         """Check if the given item exists
 
         Parameters
@@ -175,7 +177,9 @@ class QtileCommandInterface(CommandInterface):
         cmd = obj.command(command)
         return cmd is not None
 
-    def has_item(self, node: CommandGraphNode, object_type: str, item: Union[str, int]) -> bool:
+    def has_item(
+        self, node: CommandGraphNode, object_type: str, item: Union[str, int]
+    ) -> bool:
         """Check if the given item exists
 
         Parameters
@@ -227,9 +231,9 @@ class IPCCommandInterface(CommandInterface):
         kwargs:
             The keyword arguments to pass into the command graph call.
         """
-        status, result = self._client.send((
-            call.parent.selectors, call.name, args, kwargs
-        ))
+        status, result = self._client.send(
+            (call.parent.selectors, call.name, args, kwargs)
+        )
         if status == SUCCESS:
             return result
         if status == ERROR:
@@ -258,7 +262,9 @@ class IPCCommandInterface(CommandInterface):
         commands = self.execute(cmd_call, (), {})
         return command in commands
 
-    def has_item(self, node: CommandGraphNode, object_type: str, item: Union[str, int]) -> bool:
+    def has_item(
+        self, node: CommandGraphNode, object_type: str, item: Union[str, int]
+    ) -> bool:
         """Check if the given item exists
 
         Resolves the available commands for the given command node of the given
@@ -295,7 +301,9 @@ class IPCCommandServer:
         """
         self.qtile = qtile
 
-    def call(self, data: Tuple[List[SelectorType], str, Tuple, Dict]) -> Tuple[int, Any]:
+    def call(
+        self, data: Tuple[List[SelectorType], str, Tuple, Dict]
+    ) -> Tuple[int, Any]:
         """Receive and parse the given data"""
         selectors, name, args, kwargs = data
         try:

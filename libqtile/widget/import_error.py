@@ -26,4 +26,5 @@ def make_error(module_path, class_name, error):
         def __init__(self, **config):
             _TextBox.__init__(self, **config)
             self.text = "Import Error: %s" % class_name
+
     return ImportErrorWidget

@@ -69,8 +69,11 @@ class LazyCall:
         """The kwargs to the given call"""
         return self._kwargs
 
-    def when(self, layout: Optional[Union[Iterable[str], str]] = None,
-             when_floating: bool = True) -> 'LazyCall':
+    def when(
+        self,
+        layout: Optional[Union[Iterable[str], str]] = None,
+        when_floating: bool = True,
+    ) -> 'LazyCall':
         """Enable call only for given layout(s) and floating state
 
         Parameters
@@ -114,7 +117,9 @@ class LazyCommandInterface(CommandInterface):
         """Lazily resolve the given command"""
         return True
 
-    def has_item(self, node: CommandGraphNode, object_type: str, item: Union[str, int]) -> bool:
+    def has_item(
+        self, node: CommandGraphNode, object_type: str, item: Union[str, int]
+    ) -> bool:
         """Lazily resolve the given item"""
         return True
 

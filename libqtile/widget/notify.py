@@ -35,15 +35,12 @@ from libqtile.widget import base
 
 class Notify(base._TextBox):
     """A notify widget"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("foreground_urgent", "ff0000", "Foreground urgent priority colour"),
         ("foreground_low", "dddddd", "Foreground low priority  colour"),
-        (
-            "default_timeout",
-            None,
-            "Default timeout (seconds) for notifications"
-        ),
+        ("default_timeout", None, "Default timeout (seconds) for notifications"),
         ("audiofile", None, "Audiofile played during notifications"),
     ]
 
@@ -61,7 +58,7 @@ class Notify(base._TextBox):
             self.font,
             self.fontsize,
             self.fontshadow,
-            markup=True
+            markup=True,
         )
 
     def set_notif_text(self, notif):
@@ -70,14 +67,14 @@ class Notify(base._TextBox):
         if urgency != 1:
             self.text = '<span color="%s">%s</span>' % (
                 utils.hex(
-                    self.foreground_urgent if urgency == 2
-                    else self.foreground_low
+                    self.foreground_urgent if urgency == 2 else self.foreground_low
                 ),
-                self.text
+                self.text,
             )
         if notif.body:
             self.text = '<span weight="bold">%s</span> - %s' % (
-                self.text, pangocffi.markup_escape_text(notif.body)
+                self.text,
+                pangocffi.markup_escape_text(notif.body),
             )
         if self.audiofile and path.exists(self.audiofile):
             self.qtile.cmd_spawn("aplay -q '%s'" % self.audiofile)

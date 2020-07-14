@@ -37,6 +37,7 @@ class Gap(CommandObject):
         The "thickness" of the gap, i.e. the height of a horizontal gap, or the
         width of a vertical gap.
     """
+
     def __init__(self, size):
         """
         """
@@ -149,6 +150,7 @@ class Bar(Gap, configurable.Configurable):
         The "thickness" of the bar, i.e. the height of a horizontal bar, or the
         width of a vertical bar.
     """
+
     defaults = [
         ("background", "#000000", "Background colour."),
         ("opacity", 1, "Bar window opacity."),
@@ -198,16 +200,11 @@ class Bar(Gap, configurable.Configurable):
             w._test_orientation_compatibility(self.horizontal)
 
         self.window = window.Internal.create(
-            self.qtile,
-            self.x, self.y, self.width, self.height,
-            self.opacity
+            self.qtile, self.x, self.y, self.width, self.height, self.opacity
         )
 
         self.drawer = drawer.Drawer(
-            self.qtile,
-            self.window.window.wid,
-            self.width,
-            self.height
+            self.qtile, self.window.window.wid, self.width, self.height
         )
         self.drawer.clear(self.background)
 
@@ -290,18 +287,14 @@ class Bar(Gap, configurable.Configurable):
         widget = self.get_widget_in_position(e)
         if widget:
             widget.button_press(
-                e.event_x - widget.offsetx,
-                e.event_y - widget.offsety,
-                e.detail
+                e.event_x - widget.offsetx, e.event_y - widget.offsety, e.detail
             )
 
     def handle_ButtonRelease(self, e):  # noqa: N802
         widget = self.get_widget_in_position(e)
         if widget:
             widget.button_release(
-                e.event_x - widget.offsetx,
-                e.event_y - widget.offsety,
-                e.detail
+                e.event_x - widget.offsetx, e.event_y - widget.offsety, e.detail
             )
 
     def widget_grab_keyboard(self, widget):
@@ -348,7 +341,7 @@ class Bar(Gap, configurable.Configurable):
             height=self.height,
             position=self.position,
             widgets=[i.info() for i in self.widgets],
-            window=self.window.window.wid
+            window=self.window.window.wid,
         )
 
     def is_show(self):
@@ -371,8 +364,10 @@ class Bar(Gap, configurable.Configurable):
             :screen The integer screen offset
             :position One of "top", "bottom", "left", or "right"
         """
+
         class _Fake:
             pass
+
         fake = _Fake()
         fake.event_x = x
         fake.event_y = y

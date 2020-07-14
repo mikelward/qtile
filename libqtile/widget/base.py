@@ -108,6 +108,7 @@ class _Widget(CommandObject, configurable.Configurable):
     will be executed. Callbacks can be assigned to other buttons by adding more entries
     to the passed dictionary.
     """
+
     orientations = ORIENTATION_BOTH
     offsetx = None
     offsety = None
@@ -175,13 +176,13 @@ class _Widget(CommandObject, configurable.Configurable):
         if horizontal:
             if not self.orientations & ORIENTATION_HORIZONTAL:
                 raise confreader.ConfigError(
-                    self.__class__.__name__ +
-                    " is not compatible with the orientation of the bar."
+                    self.__class__.__name__
+                    + " is not compatible with the orientation of the bar."
                 )
         elif not self.orientations & ORIENTATION_VERTICAL:
             raise confreader.ConfigError(
-                self.__class__.__name__ +
-                " is not compatible with the orientation of the bar."
+                self.__class__.__name__
+                + " is not compatible with the orientation of the bar."
             )
 
     def timer_setup(self):
@@ -193,10 +194,7 @@ class _Widget(CommandObject, configurable.Configurable):
         self.qtile = qtile
         self.bar = bar
         self.drawer = drawer.Drawer(
-            qtile,
-            self.win.wid,
-            self.bar.width,
-            self.bar.height
+            qtile, self.win.wid, self.bar.width, self.bar.height
         )
         if not self.configured:
             self.configured = True
@@ -209,8 +207,7 @@ class _Widget(CommandObject, configurable.Configurable):
 
     def clear(self):
         self.drawer.set_source_rgb(self.bar.background)
-        self.drawer.fillrect(self.offsetx, self.offsety, self.width,
-                             self.height)
+        self.drawer.fillrect(self.offsetx, self.offsety, self.width, self.height)
 
     def info(self):
         return dict(
@@ -274,8 +271,7 @@ class _Widget(CommandObject, configurable.Configurable):
         """
             This method calls either ``.call_later`` with given arguments.
         """
-        return self.qtile.call_later(seconds, self._wrapper, method,
-                                     *method_args)
+        return self.qtile.call_later(seconds, self._wrapper, method, *method_args)
 
     def call_process(self, command, **kwargs):
         """
@@ -304,19 +300,16 @@ class _TextBox(_Widget):
     """
         Base class for widgets that are just boxes containing text.
     """
+
     orientations = ORIENTATION_HORIZONTAL
     defaults = [
         ("font", "sans", "Default font"),
         ("fontsize", None, "Font size. Calculated if None."),
         ("padding", None, "Padding. Calculated if None."),
         ("foreground", "ffffff", "Foreground colour"),
-        (
-            "fontshadow",
-            None,
-            "font shadow color, default is None(no shadow)"
-        ),
+        ("fontshadow", None, "font shadow color, default is None(no shadow)"),
         ("markup", True, "Whether or not to use pango markup"),
-        ("fmt", "{}", "How to format the text")
+        ("fmt", "{}", "How to format the text"),
     ]  # type: List[Tuple[str, Any, str]]
 
     def __init__(self, text=" ", width=bar.CALCULATED, **config):
@@ -391,10 +384,7 @@ class _TextBox(_Widget):
 
     def calculate_length(self):
         if self.text:
-            return min(
-                self.layout.width,
-                self.bar.width
-            ) + self.actual_padding * 2
+            return min(self.layout.width, self.bar.width) + self.actual_padding * 2
         else:
             return 0
 
@@ -405,12 +395,13 @@ class _TextBox(_Widget):
         self.drawer.clear(self.background or self.bar.background)
         self.layout.draw(
             self.actual_padding or 0,
-            int(self.bar.height / 2.0 - self.layout.height / 2.0) + 1
+            int(self.bar.height / 2.0 - self.layout.height / 2.0) + 1,
         )
         self.drawer.draw(offsetx=self.offsetx, width=self.width)
 
-    def cmd_set_font(self, font=UNSPECIFIED, fontsize=UNSPECIFIED,
-                     fontshadow=UNSPECIFIED):
+    def cmd_set_font(
+        self, font=UNSPECIFIED, fontsize=UNSPECIFIED, fontshadow=UNSPECIFIED
+    ):
         """
             Change the font used by this widget. If font is None, the current
             font is used.
@@ -439,8 +430,12 @@ class InLoopPollText(_TextBox):
     you want to run something nontrivial, use ThreadedPollWidget.) """
 
     defaults = [
-        ("update_interval", 600, "Update interval in seconds, if none, the "
-            "widget updates whenever the event loop is idle."),
+        (
+            "update_interval",
+            600,
+            "Update interval in seconds, if none, the "
+            "widget updates whenever the event loop is idle.",
+        ),
     ]  # type: List[Tuple[str, Any, str]]
 
     def __init__(self, default_text="N/A", width=bar.CALCULATED, **config):
@@ -492,6 +487,7 @@ class InLoopPollText(_TextBox):
 class ThreadedPollText(InLoopPollText):
     """ A common interface for polling some REST URL, munging the data, and
     rendering the result in a text box. """
+
     def tick(self):
         def worker():
             try:
@@ -500,6 +496,7 @@ class ThreadedPollText(InLoopPollText):
                     self.qtile.call_soon_threadsafe(self.update, text)
             except:  # noqa: E722
                 logger.exception("problem polling to update widget %s", self.name)
+
         # TODO: There are nice asyncio constructs for this sort of thing, I
         # think...
         threading.Thread(target=worker).start()
@@ -517,9 +514,14 @@ class ThreadPoolText(_TextBox):
 
     param: text - Initial text to display.
     """
+
     defaults = [
-        ("update_interval", None, "Update interval in seconds, if none, the "
-            "widget updates whenever it's done'."),
+        (
+            "update_interval",
+            None,
+            "Update interval in seconds, if none, the "
+            "widget updates whenever it's done'.",
+        ),
     ]  # type: List[Tuple[str, Any, str]]
 
     def __init__(self, text, **config):
@@ -565,6 +567,7 @@ class ThreadPoolText(_TextBox):
 
     def poll(self):
         pass
+
 
 # these two classes below look SUSPICIOUSLY similar
 
@@ -624,6 +627,7 @@ class Mirror(_Widget):
         def _():
             draw()
             self.draw()
+
         return _
 
     def draw(self):

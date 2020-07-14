@@ -27,16 +27,25 @@ from libqtile.widget import base
 
 class CheckUpdates(base.ThreadedPollText):
     """Shows number of pending updates in different unix systems"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("distro", "Arch", "Name of your distribution"),
-        ("custom_command", None, "Custom shell command for checking updates (counts the lines of the output)"),
+        (
+            "custom_command",
+            None,
+            "Custom shell command for checking updates (counts the lines of the output)",
+        ),
         ("update_interval", 60, "Update interval in seconds."),
         ('execute', None, 'Command to execute on click'),
         ("display_format", "Updates: {updates}", "Display format if updates available"),
         ("colour_no_updates", "ffffff", "Colour when there's no updates."),
         ("colour_have_updates", "ffffff", "Colour when there are updates."),
-        ("restart_indicator", "", "Indicator to represent reboot is required. (Ubuntu only)")
+        (
+            "restart_indicator",
+            "",
+            "Indicator to represent reboot is required. (Ubuntu only)",
+        ),
     ]
 
     def __init__(self, **config):
@@ -44,16 +53,17 @@ class CheckUpdates(base.ThreadedPollText):
         self.add_defaults(CheckUpdates.defaults)
 
         # format: "Distro": ("cmd", "number of lines to subtract from output")
-        self.cmd_dict = {"Arch": ("pacman -Qu", 0),
-                         "Arch_checkupdates": ("checkupdates", 0),
-                         "Arch_Sup": ("pacman -Sup", 1),
-                         "Arch_yay": ("yay -Qu", 0),
-                         "Debian": ("apt-show-versions -u -b", 0),
-                         "Ubuntu": ("aptitude search ~U", 0),
-                         "Fedora": ("dnf list updates", 3),
-                         "FreeBSD": ("pkg_version -I -l '<'", 0),
-                         "Mandriva": ("urpmq --auto-select", 0)
-                         }
+        self.cmd_dict = {
+            "Arch": ("pacman -Qu", 0),
+            "Arch_checkupdates": ("checkupdates", 0),
+            "Arch_Sup": ("pacman -Sup", 1),
+            "Arch_yay": ("yay -Qu", 0),
+            "Debian": ("apt-show-versions -u -b", 0),
+            "Ubuntu": ("aptitude search ~U", 0),
+            "Fedora": ("dnf list updates", 3),
+            "FreeBSD": ("pkg_version -I -l '<'", 0),
+            "Mandriva": ("urpmq --auto-select", 0),
+        }
 
         # Check if distro name is valid.
         try:
@@ -61,8 +71,13 @@ class CheckUpdates(base.ThreadedPollText):
             self.subtr = self.cmd_dict[self.distro][1]
         except KeyError:
             distros = sorted(self.cmd_dict.keys())
-            logger.error(self.distro + ' is not a valid distro name. ' +
-                         'Use one of the list: ' + str(distros) + '.')
+            logger.error(
+                self.distro
+                + ' is not a valid distro name. '
+                + 'Use one of the list: '
+                + str(distros)
+                + '.'
+            )
             self.cmd = None
 
     def _check_updates(self):

@@ -42,9 +42,18 @@ class Tile(_SimpleLayoutBase):
         ("margin", 0, "Margin of the layout"),
     ]
 
-    def __init__(self, ratio=0.618, masterWindows=1, expand=True,  # noqa: N803
-                 ratio_increment=0.05, add_on_top=True, add_after_last=False,
-                 shift_windows=False, master_match=None, **config):
+    def __init__(
+        self,
+        ratio=0.618,
+        masterWindows=1,
+        expand=True,  # noqa: N803
+        ratio_increment=0.05,
+        add_on_top=True,
+        add_after_last=False,
+        shift_windows=False,
+        master_match=None,
+        **config
+    ):
         _SimpleLayoutBase.__init__(self, **config)
         self.add_defaults(Tile.defaults)
         self.ratio = ratio
@@ -58,11 +67,11 @@ class Tile(_SimpleLayoutBase):
 
     @property
     def master_windows(self):
-        return self.clients[:self.master]
+        return self.clients[: self.master]
 
     @property
     def slave_windows(self):
-        return self.clients[self.master:]
+        return self.clients[self.master :]
 
     def up(self):
         if self.shift_windows:
@@ -91,8 +100,10 @@ class Tile(_SimpleLayoutBase):
 
     def shift(self, idx1, idx2):
         if self.clients:
-            self.clients[idx1], self.clients[idx2] = \
-                self.clients[idx2], self.clients[idx1]
+            self.clients[idx1], self.clients[idx2] = (
+                self.clients[idx2],
+                self.clients[idx1],
+            )
             self.group.layout_all(True)
 
     def clone(self, group):
@@ -115,9 +126,11 @@ class Tile(_SimpleLayoutBase):
         if self.clients and client in self.clients:
             pos = self.clients.index(client)
             if client in self.master_windows:
-                w = int(screen_width * self.ratio) \
-                    if len(self.slave_windows) or not self.expand \
+                w = (
+                    int(screen_width * self.ratio)
+                    if len(self.slave_windows) or not self.expand
                     else screen_width
+                )
                 h = screen_height // self.master
                 x = screen.x
                 y = screen.y + pos * h
@@ -125,7 +138,7 @@ class Tile(_SimpleLayoutBase):
                 w = screen_width - int(screen_width * self.ratio)
                 h = screen_height // (len(self.slave_windows))
                 x = screen.x + int(screen_width * self.ratio)
-                y = screen.y + self.clients[self.master:].index(client) * h
+                y = screen.y + self.clients[self.master :].index(client) * h
             if client.has_focus:
                 bc = self.group.qtile.color_pixel(self.border_focus)
             else:
@@ -145,10 +158,12 @@ class Tile(_SimpleLayoutBase):
 
     def info(self):
         d = _SimpleLayoutBase.info(self)
-        d.update(dict(
-            master=[c.name for c in self.master_windows],
-            slave=[c.name for c in self.slave_windows],
-        ))
+        d.update(
+            dict(
+                master=[c.name for c in self.master_windows],
+                slave=[c.name for c in self.slave_windows],
+            )
+        )
         return d
 
     def cmd_shuffle_down(self):

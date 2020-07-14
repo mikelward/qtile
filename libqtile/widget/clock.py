@@ -41,15 +41,20 @@ except ImportError:
 
 class Clock(base.InLoopPollText):
     """A simple but flexible text-based clock"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('format', '%H:%M', 'A Python datetime format string'),
-        ('update_interval', 1., 'Update interval for the clock'),
-        ('timezone', None, 'The timezone to use for this clock, either as'
-         ' string if pytz or dateutil is installed (e.g. "US/Central" or'
-         ' anything in /usr/share/zoneinfo), or as tzinfo (e.g.'
-         ' datetime.timezone.utc). None means the system local timezone and is'
-         ' the default.')
+        ('update_interval', 1.0, 'Update interval for the clock'),
+        (
+            'timezone',
+            None,
+            'The timezone to use for this clock, either as'
+            ' string if pytz or dateutil is installed (e.g. "US/Central" or'
+            ' anything in /usr/share/zoneinfo), or as tzinfo (e.g.'
+            ' datetime.timezone.utc). None means the system local timezone and is'
+            ' the default.',
+        ),
     ]
     DELTA = timedelta(seconds=0.5)
 
@@ -62,10 +67,12 @@ class Clock(base.InLoopPollText):
             elif "dateutil" in sys.modules:
                 self.timezone = dateutil.tz.gettz(self.timezone)
             else:
-                logger.warning('Clock widget can not infer its timezone from a'
-                               ' string without pytz or dateutil. Install one'
-                               ' of these libraries, or give it a'
-                               ' datetime.tzinfo instance.')
+                logger.warning(
+                    'Clock widget can not infer its timezone from a'
+                    ' string without pytz or dateutil. Install one'
+                    ' of these libraries, or give it a'
+                    ' datetime.tzinfo instance.'
+                )
         if self.timezone is None:
             logger.info('Defaulting to the system local timezone.')
 

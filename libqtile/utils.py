@@ -110,8 +110,9 @@ class UnixCommandRuntimeError(Warning):
     pass
 
 
-def catch_exception_and_warn(warning=Warning, return_on_exception=None,
-                             excepts=Exception):
+def catch_exception_and_warn(
+    warning=Warning, return_on_exception=None, excepts=Exception
+):
     """
     .. function:: warn_on_exception(func, [warning_class, return_on_failure,
             excepts])
@@ -130,6 +131,7 @@ def catch_exception_and_warn(warning=Warning, return_on_exception=None,
         :type warning: Warning
         :rtype: a callable
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -140,7 +142,9 @@ def catch_exception_and_warn(warning=Warning, return_on_exception=None,
                 logger.warning(err.strerror)
                 warnings.warn(err.strerror, warning)
             return return_value
+
         return wrapper
+
     return decorator
 
 
@@ -185,8 +189,9 @@ def import_class(module_path, class_name, fallback=None):
         module = importlib.import_module(module_path, __package__)
         return getattr(module, class_name)
     except ImportError as error:
-        logger.warning("Unmet dependencies for '%s.%s': %s", module_path,
-                       class_name, error)
+        logger.warning(
+            "Unmet dependencies for '%s.%s': %s", module_path, class_name, error
+        )
         if fallback:
             logger.debug("%s", traceback.format_exc())
             return fallback(module_path, class_name, error)
@@ -222,8 +227,10 @@ def send_notification(title, message, urgent=False, timeout=10000):
     """Send a notification."""
     try:
         import gi
+
         gi.require_version("Notify", "0.7")
         from gi.repository import Notify
+
         Notify.init("Qtile")
         info = Notify.get_server_info()
         if info[0]:

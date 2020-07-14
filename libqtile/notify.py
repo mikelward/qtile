@@ -32,6 +32,7 @@ try:
     import dbus
     from dbus import service
     from dbus.mainloop.glib import DBusGMainLoop
+
     DBusGMainLoop(set_as_default=True)
     has_dbus = True
 except ImportError:
@@ -41,6 +42,7 @@ BUS_NAME = 'org.freedesktop.Notifications'
 SERVICE_PATH = '/org/freedesktop/Notifications'
 
 if has_dbus:
+
     class NotificationService(service.Object):
         def __init__(self, manager):
             bus = dbus.SessionBus()
@@ -61,8 +63,17 @@ if has_dbus:
                 self._capabilities.update(set(capabilities))
 
         @service.method(BUS_NAME, in_signature='susssasa{sv}i', out_signature='u')
-        def Notify(self, app_name, replaces_id, app_icon, summary,  # noqa: N802
-                   body, actions, hints, timeout):
+        def Notify(
+            self,
+            app_name,
+            replaces_id,
+            app_icon,
+            summary,  # noqa: N802
+            body,
+            actions,
+            hints,
+            timeout,
+        ):
             notif = Notification(
                 summary, body, timeout, hints, app_name, replaces_id, app_icon, actions
             )
@@ -82,8 +93,17 @@ if has_dbus:
 
 
 class Notification:
-    def __init__(self, summary, body='', timeout=-1, hints=None, app_name='',
-                 replaces_id=None, app_icon=None, actions=None):
+    def __init__(
+        self,
+        summary,
+        body='',
+        timeout=-1,
+        hints=None,
+        app_name='',
+        replaces_id=None,
+        app_icon=None,
+        actions=None,
+    ):
         self.summary = summary
         self.body = body
         self.timeout = timeout

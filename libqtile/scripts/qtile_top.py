@@ -43,17 +43,39 @@ class TraceCantStart(Exception):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Top like for qtile")
-    parser.add_argument('-l', '--lines', type=int, dest="lines", default=10,
-                        help='Number of lines.')
-    parser.add_argument('-r', '--raw', dest="raw", action="store_true",
-                        default=False, help='Output raw without curses')
-    parser.add_argument('-t', '--time', type=float, dest="seconds",
-                        default=1.5, help='Number of seconds to refresh')
-    parser.add_argument('--force-start', dest="force_start",
-                        action="store_true", default=False,
-                        help='Force start tracemalloc on qtile')
-    parser.add_argument('-s', '--socket', type=str, dest="socket",
-                        help='Use specified communication socket.')
+    parser.add_argument(
+        '-l', '--lines', type=int, dest="lines", default=10, help='Number of lines.'
+    )
+    parser.add_argument(
+        '-r',
+        '--raw',
+        dest="raw",
+        action="store_true",
+        default=False,
+        help='Output raw without curses',
+    )
+    parser.add_argument(
+        '-t',
+        '--time',
+        type=float,
+        dest="seconds",
+        default=1.5,
+        help='Number of seconds to refresh',
+    )
+    parser.add_argument(
+        '--force-start',
+        dest="force_start",
+        action="store_true",
+        default=False,
+        help='Force start tracemalloc on qtile',
+    )
+    parser.add_argument(
+        '-s',
+        '--socket',
+        type=str,
+        dest="socket",
+        help='Use specified communication socket.',
+    )
 
     opts = parser.parse_args()
     return opts
@@ -73,20 +95,27 @@ def get_trace(client, force_start):
 
 
 def filter_snapshot(snapshot):
-    return snapshot.filter_traces((
-        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
-        tracemalloc.Filter(False, "<unknown>"),
-    ))
+    return snapshot.filter_traces(
+        (
+            tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+            tracemalloc.Filter(False, "<unknown>"),
+        )
+    )
 
 
-def get_stats(scr, client, group_by='lineno', limit=10, seconds=1.5,
-              force_start=False):
+def get_stats(scr, client, group_by='lineno', limit=10, seconds=1.5, force_start=False):
     (max_y, max_x) = scr.getmaxyx()
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
     while True:
         scr.addstr(0, 0, "Qtile - Top {} lines".format(limit))
-        scr.addstr(1, 0, '{0:<3s} {1:<40s} {2:<30s} {3:<16s}'.format('#', 'Line', 'Memory', ' ' * (max_x - 71)),
-                   curses.A_BOLD | curses.A_REVERSE)
+        scr.addstr(
+            1,
+            0,
+            '{0:<3s} {1:<40s} {2:<30s} {3:<16s}'.format(
+                '#', 'Line', 'Memory', ' ' * (max_x - 71)
+            ),
+            curses.A_BOLD | curses.A_REVERSE,
+        )
 
         snapshot = get_trace(client, force_start)
         snapshot = filter_snapshot(snapshot)
@@ -110,7 +139,7 @@ def get_stats(scr, client, group_by='lineno', limit=10, seconds=1.5,
         cnt += 2
         if other:
             size = sum(stat.size for stat in other)
-            other_size = ("{:d} other: {:.1f} KiB".format(len(other), size / 1024.0))
+            other_size = "{:d} other: {:.1f} KiB".format(len(other), size / 1024.0)
             scr.addstr(cnt, 0, other_size, curses.A_BOLD)
             cnt += 1
 
@@ -134,8 +163,11 @@ def raw_stats(client, group_by='lineno', limit=10, force_start=False):
         frame = stat.traceback[0]
         # replace "/path/to/module/file.py" with "module/file.py"
         filename = os.sep.join(frame.filename.split(os.sep)[-2:])
-        print("#{}: {}:{}: {:.1f} KiB"
-              .format(index, filename, frame.lineno, stat.size / 1024.0))
+        print(
+            "#{}: {}:{}: {:.1f} KiB".format(
+                index, filename, frame.lineno, stat.size / 1024.0
+            )
+        )
         line = linecache.getline(frame.filename, frame.lineno).strip()
         if line:
             print('    {}'.format(line))
@@ -163,13 +195,16 @@ def main():
 
     try:
         if not opts.raw:
-            curses.wrapper(get_stats, client, limit=lines, seconds=seconds,
-                           force_start=force_start)
+            curses.wrapper(
+                get_stats, client, limit=lines, seconds=seconds, force_start=force_start
+            )
         else:
             raw_stats(client, limit=lines, force_start=force_start)
     except TraceNotStarted:
-        print("tracemalloc not started on qtile, start by setting "
-              "PYTHONTRACEMALLOC=1 before starting qtile")
+        print(
+            "tracemalloc not started on qtile, start by setting "
+            "PYTHONTRACEMALLOC=1 before starting qtile"
+        )
         print("or force start tracemalloc now, but you'll lose early traces")
         exit(1)
     except TraceCantStart:

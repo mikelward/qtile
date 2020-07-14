@@ -38,6 +38,7 @@ def _decode_to_image_surface(bytes_img, width=None, height=None):
         return _SurfaceInfo(surf, fmt)
     except TypeError:
         from libqtile.log_utils import logger
+
         logger.exception(
             "Couldn't load cairo image at specified width and height. "
             "Falling back to image scaling using cairo. "
@@ -158,6 +159,7 @@ class Img:
     - theta :: rotation of pattern counter clockwise in degrees
     Pattern is first stretched, then rotated.
     """
+
     def __init__(self, bytes_img, name='', path=''):
         self.bytes_img = bytes_img
         self.name = name
@@ -306,6 +308,7 @@ def get_matching_files(dirpath='.', explicit_filetype=False, *names):
     Return a dict with keys equal to entries in names
     and values a list of matching paths.
     """
+
     def match_files_in_dir(dirpath, regex_pattern):
         for dpath, dnames, fnames in os.walk(dirpath):
             matches = (regex_pattern.match(x) for x in fnames)
@@ -341,6 +344,7 @@ class Loader:
     >>> ldr = Loader('/usr/share/icons/Adwaita/24x24', '/usr/share/icons/Adwaita')
     >>> d_loaded_images = ldr.icons('audio-volume-muted', 'audio-volume-low')
     """
+
     def __init__(self, *directories, **kwargs):
         self.explicit_filetype = False
         for k, v in kwargs.items():

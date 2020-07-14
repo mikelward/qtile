@@ -42,6 +42,7 @@ class CurrentLayout(base._TextBox):
     Display the name of the current layout of the current group of the screen,
     the bar containing the widget, is on.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
 
     def __init__(self, width=bar.CALCULATED, **config):
@@ -57,6 +58,7 @@ class CurrentLayout(base._TextBox):
             if group.screen is not None and group.screen == self.bar.screen:
                 self.text = layout.name
                 self.bar.draw()
+
         hook.subscribe.layout_change(hook_response)
 
     def button_press(self, x, y, button):
@@ -84,15 +86,11 @@ class CurrentLayoutIcon(base._TextBox):
     - `~/.icons`
     - built-in qtile icons
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
 
     defaults = [
-        (
-            'scale',
-            1,
-            'Scale factor relative to the bar height.  '
-            'Defaults to 1'
-        ),
+        ('scale', 1, 'Scale factor relative to the bar height.  ' 'Defaults to 1'),
         (
             'custom_icon_paths',
             [],
@@ -100,8 +98,8 @@ class CurrentLayoutIcon(base._TextBox):
             'using built-in icons or icons in ~/.icons dir.  '
             'This can also be used to provide'
             'missing icons for custom layouts.  '
-            'Defaults to empty list.'
-        )
+            'Defaults to empty list.',
+        ),
     ]
 
     def __init__(self, **config):
@@ -127,10 +125,12 @@ class CurrentLayoutIcon(base._TextBox):
         """
         Listens for layout change and performs a redraw when it occurs.
         """
+
         def hook_response(layout, group):
             if group.screen is not None and group.screen == self.bar.screen:
                 self.current_layout = layout.name
                 self.bar.draw()
+
         hook.subscribe.layout_change(hook_response)
 
     def button_press(self, x, y, button):
@@ -144,9 +144,7 @@ class CurrentLayoutIcon(base._TextBox):
             try:
                 surface = self.surfaces[self.current_layout]
             except KeyError:
-                logger.error('No icon for layout {}'.format(
-                    self.current_layout
-                ))
+                logger.error('No icon for layout {}'.format(self.current_layout))
             else:
                 self.drawer.clear(self.background or self.bar.background)
                 self.drawer.ctx.set_source(surface)
@@ -163,8 +161,9 @@ class CurrentLayoutIcon(base._TextBox):
         """
         return [
             layout_class_name.lower()
-            for layout_class, layout_class_name
-            in map(lambda x: (getattr(layout_module, x), x), dir(layout_module))
+            for layout_class, layout_class_name in map(
+                lambda x: (getattr(layout_module, x), x), dir(layout_module)
+            )
             if inspect.isclass(layout_class) and issubclass(layout_class, Layout)
         ]
 

@@ -160,15 +160,21 @@ class VerticalTile(_SimpleLayoutBase):
                 if self.maximized:
                     y += (index * sec_pane_height) + (border_width * 2 * index)
                 else:
-                    y += (index * normal_pane_height) +\
-                        (border_width * 2 * index)
+                    y += (index * normal_pane_height) + (border_width * 2 * index)
 
                 if self.maximized and window is not self.maximized:
                     if index > self.clients.index(self.maximized):
                         y = y - sec_pane_height + main_pane_height
 
-            window.place(screen.x, y, width, height, border_width,
-                         border_color, margin=self.margin)
+            window.place(
+                screen.x,
+                y,
+                width,
+                height,
+                border_width,
+                border_color,
+                margin=self.margin,
+            )
             window.unhide()
         else:
             window.hide()

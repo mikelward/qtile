@@ -44,18 +44,22 @@ class ThermalSensor(base.InLoopPollText):
     Then you can choose which you want, otherwise it will display the first
     available.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('metric', True, 'True to use metric/C, False to use imperial/F'),
         ('show_tag', False, 'Show tag sensor'),
         ('update_interval', 2, 'Update interval in seconds'),
-        ('tag_sensor', None,
-            'Tag of the temperature sensor. For example: "temp1" or "Core 0"'),
+        (
+            'tag_sensor',
+            None,
+            'Tag of the temperature sensor. For example: "temp1" or "Core 0"',
+        ),
         (
             'threshold',
             70,
             'If the current temperature value is above, '
-            'then change to foreground_alert colour'
+            'then change to foreground_alert colour',
         ),
         ('foreground_alert', 'ff0000', 'Foreground colour alert'),
     ]
@@ -64,13 +68,14 @@ class ThermalSensor(base.InLoopPollText):
         base.InLoopPollText.__init__(self, **config)
         self.add_defaults(ThermalSensor.defaults)
         self.sensors_temp = re.compile(
-            (r"\n([\w ]+):"  # Sensor tag name
-             r"\s+[+|-]"     # temp signed
-             r"(\d+\.\d+)"   # temp value
-             "({degrees}"   # degree symbol match
-             "[C|F])"       # Celsius or Fahrenheit
-             ).format(degrees=u"\xb0"),
-            re.UNICODE | re.VERBOSE
+            (
+                r"\n([\w ]+):"  # Sensor tag name
+                r"\s+[+|-]"  # temp signed
+                r"(\d+\.\d+)"  # temp value
+                "({degrees}"  # degree symbol match
+                "[C|F])"  # Celsius or Fahrenheit
+            ).format(degrees=u"\xb0"),
+            re.UNICODE | re.VERBOSE,
         )
         self.value_temp = re.compile(r"\d+\.\d+")
         temp_values = self.get_temp_sensors()
@@ -86,14 +91,18 @@ class ThermalSensor(base.InLoopPollText):
                 break
 
     @catch_exception_and_warn(warning=UnixCommandNotFound, excepts=OSError)
-    @catch_exception_and_warn(warning=UnixCommandRuntimeError,
-                              excepts=CalledProcessError,
-                              return_on_exception="")
+    @catch_exception_and_warn(
+        warning=UnixCommandRuntimeError,
+        excepts=CalledProcessError,
+        return_on_exception="",
+    )
     def get_temp_sensors(self):
         """calls the unix `sensors` command with `-f` flag if user has specified that
         the output should be read in Fahrenheit.
         """
-        command = ["sensors", ]
+        command = [
+            "sensors",
+        ]
         if not self.metric:
             command.append("-f")
         sensors_out = self.call_process(command)

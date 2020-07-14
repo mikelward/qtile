@@ -61,6 +61,7 @@ from libqtile.widget.base import _Widget
 
 def _import_module(module_name, dir_path):
     import imp
+
     fp = None
     try:
         fp, pathname, description = imp.find_module(module_name, [dir_path])
@@ -80,14 +81,8 @@ def handle_exception(loop, context):
 
 class Qtile(CommandObject):
     """This object is the `root` of the command graph"""
-    def __init__(
-        self,
-        kore,
-        config,
-        eventloop,
-        no_spawn=False,
-        state=None
-    ):
+
+    def __init__(self, kore, config, eventloop, no_spawn=False, state=None):
         self._restart = False
         self.no_spawn = no_spawn
 
@@ -136,8 +131,9 @@ class Qtile(CommandObject):
         for grp in self.config.groups:
             if isinstance(grp, ScratchPadConfig):
                 sp = ScratchPad(grp.name, grp.dropdowns, grp.label)
-                sp._configure([self.config.floating_layout],
-                              self.config.floating_layout, self)
+                sp._configure(
+                    [self.config.floating_layout], self.config.floating_layout, self
+                )
                 self.groups.append(sp)
                 self.groups_map[sp.name] = sp
 
@@ -162,6 +158,7 @@ class Qtile(CommandObject):
         # It fixes problems with focus when clicking windows of some specific clients like xterm
         def noop(qtile):
             pass
+
         self.config.mouse += (Click([], "Button1", lazy.function(noop), focus="after"),)
 
         self.mouse_map = {}
@@ -235,6 +232,7 @@ class Qtile(CommandObject):
                         ctx.iteration(True)
                     except Exception:
                         logger.exception("got exception from gobject")
+
             self._glib_loop = self.run_in_executor(gobject_thread)
         except ImportError:
             logger.warning("importing dbus/gobject failed, dbus will not work.")
@@ -289,6 +287,7 @@ class Qtile(CommandObject):
         if self._glib_loop:
             try:
                 from gi.repository import GLib
+
                 GLib.idle_add(lambda: None)
                 await self._glib_loop
             except ImportError:
@@ -353,7 +352,11 @@ class Qtile(CommandObject):
     def process_key_event(self, keysym: int, mask: int) -> None:
         key = self.keys_map.get((keysym, mask), None)
         if key is None:
-            logger.info("Ignoring unknown keysym: {keysym}, mask: {mask}".format(keysym=keysym, mask=mask))
+            logger.info(
+                "Ignoring unknown keysym: {keysym}, mask: {mask}".format(
+                    keysym=keysym, mask=mask
+                )
+            )
             return
 
         if isinstance(key, KeyChord):
@@ -367,7 +370,9 @@ class Qtile(CommandObject):
                     if status in (command_interface.ERROR, command_interface.EXCEPTION):
                         logger.error("KB command error %s: %s" % (cmd.name, val))
             else:
-                if self.current_chord is True or (self.current_chord and key.key == "Escape"):
+                if self.current_chord is True or (
+                    self.current_chord and key.key == "Escape"
+                ):
                     self.ungrab_chord()
                 return
 
@@ -474,7 +479,7 @@ class Qtile(CommandObject):
             if self.current_group.name == name:
                 self.current_screen.set_group(target, save_prev=False)
             self.groups.remove(group)
-            del(self.groups_map[name])
+            del self.groups_map[name]
             hook.fire("delgroup", self, name)
             hook.fire("changegroup")
             self.update_net_desktops()
@@ -497,7 +502,8 @@ class Qtile(CommandObject):
 
     @functools.lru_cache()
     def color_pixel(self, name):
-        return self.conn.screens[0].default_colormap.alloc_color(name).pixel
+        pixel = self.conn.screens[0].default_colormap.alloc_color(name).pixel
+        return pixel | 0xFF << 24
 
     @property
     def current_layout(self):
@@ -630,6 +636,7 @@ class Qtile(CommandObject):
             except Exception:
                 logger.exception("Got an exception in getting the window pid")
                 return None
+
         pids = map(get_interesting_pid, self.windows_map.values())
         pids = list(filter(lambda x: x is not None, pids))
 
@@ -661,8 +668,7 @@ class Qtile(CommandObject):
         """Find a screen based on the x and y offset"""
         result = []
         for i in self.screens:
-            if i.x <= x <= i.x + i.width and \
-                    i.y <= y <= i.y + i.height:
+            if i.x <= x <= i.x + i.width and i.y <= y <= i.y + i.height:
                 result.append(i)
         if len(result) == 1:
             return result[0]
@@ -714,8 +720,7 @@ class Qtile(CommandObject):
         # if left corner is below and right of screen
         # it can't really be a candidate
         candidate_screens = [
-            s for s in candidate_screens
-            if x < s.x + s.width and y < s.y + s.height
+            s for s in candidate_screens if x < s.x + s.width and y < s.y + s.height
         ]
         for s in candidate_screens:
             middle_x = s.x + s.width / 2
@@ -750,7 +755,7 @@ class Qtile(CommandObject):
             self.conn.conn.core.ConfigureWindow(
                 wnd,
                 xcffib.xproto.ConfigWindow.StackMode,
-                [xcffib.xproto.StackMode.Above]
+                [xcffib.xproto.StackMode.Above],
             )
 
         window = self.windows_map.get(wnd)
@@ -778,24 +783,25 @@ class Qtile(CommandObject):
                         if m.focus == "before":
                             self.cmd_focus_by_click(event)
                         status, val = self.server.call(
-                            (i.selectors, i.name, i.args, i.kwargs))
+                            (i.selectors, i.name, i.args, i.kwargs)
+                        )
                         if m.focus == "after":
                             self.cmd_focus_by_click(event)
-                        if status in (command_interface.ERROR, command_interface.EXCEPTION):
-                            logger.error(
-                                "Mouse command error %s: %s" % (i.name, val)
-                            )
+                        if status in (
+                            command_interface.ERROR,
+                            command_interface.EXCEPTION,
+                        ):
+                            logger.error("Mouse command error %s: %s" % (i.name, val))
             elif isinstance(m, Drag):
                 if m.start:
                     i = m.start
                     if m.focus == "before":
                         self.cmd_focus_by_click(event)
                     status, val = self.server.call(
-                        (i.selectors, i.name, i.args, i.kwargs))
+                        (i.selectors, i.name, i.args, i.kwargs)
+                    )
                     if status in (command_interface.ERROR, command_interface.EXCEPTION):
-                        logger.error(
-                            "Mouse command error %s: %s" % (i.name, val)
-                        )
+                        logger.error("Mouse command error %s: %s" % (i.name, val))
                         continue
                 else:
                     val = (0, 0)
@@ -808,9 +814,7 @@ class Qtile(CommandObject):
         k = self.mouse_map.get(button_code)
         for m in k:
             if not m:
-                logger.info(
-                    "Ignoring unknown button release: %s" % button_code
-                )
+                logger.info("Ignoring unknown button release: %s" % button_code)
                 continue
             if isinstance(m, Drag):
                 self._drag = None
@@ -827,16 +831,11 @@ class Qtile(CommandObject):
         if dx or dy:
             for i in cmd:
                 if i.check(self):
-                    status, val = self.server.call((
-                        i.selectors,
-                        i.name,
-                        i.args + (rx + dx, ry + dy),
-                        i.kwargs
-                    ))
+                    status, val = self.server.call(
+                        (i.selectors, i.name, i.args + (rx + dx, ry + dy), i.kwargs)
+                    )
                     if status in (command_interface.ERROR, command_interface.EXCEPTION):
-                        logger.error(
-                            "Mouse command error %s: %s" % (i.name, val)
-                        )
+                        logger.error("Mouse command error %s: %s" % (i.name, val))
 
     def focus_screen(self, n, warp=True):
         """Have Qtile move to screen and put focus there"""
@@ -909,23 +908,29 @@ class Qtile(CommandObject):
     def call_soon(self, func, *args):
         """ A wrapper for the event loop's call_soon which also flushes the X
         event queue to the server after func is called. """
+
         def f():
             func(*args)
             self.conn.flush()
+
         return self._eventloop.call_soon(f)
 
     def call_soon_threadsafe(self, func, *args):
         """ Another event loop proxy, see `call_soon`. """
+
         def f():
             func(*args)
             self.conn.flush()
+
         return self._eventloop.call_soon_threadsafe(f)
 
     def call_later(self, delay, func, *args):
         """ Another event loop proxy, see `call_soon`. """
+
         def f():
             func(*args)
             self.conn.flush()
+
         return self._eventloop.call_later(delay, f)
 
     def run_in_executor(self, func, *args):
@@ -967,6 +972,7 @@ class Qtile(CommandObject):
     def cmd_pause(self):
         """Drops into pdb"""
         import pdb
+
         pdb.set_trace()
 
     def cmd_groups(self):
@@ -981,7 +987,9 @@ class Qtile(CommandObject):
 
     def cmd_get_info(self):
         """Prints info for all groups"""
-        warnings.warn("The `get_info` command is deprecated, use `groups`", DeprecationWarning)
+        warnings.warn(
+            "The `get_info` command is deprecated, use `groups`", DeprecationWarning
+        )
         return self.cmd_groups()
 
     def get_mouse_position(self):
@@ -989,6 +997,7 @@ class Qtile(CommandObject):
 
     def cmd_display_kb(self, *args):
         """Display table of key bindings"""
+
         class FormatTable:
             def __init__(self):
                 self.max_col_size = []
@@ -1004,7 +1013,10 @@ class Qtile(CommandObject):
                 self.rows.append(row)
 
             def getformat(self):
-                format_string = " ".join("%-{0:d}s".format(max_col_size + 2) for max_col_size in self.max_col_size)
+                format_string = " ".join(
+                    "%-{0:d}s".format(max_col_size + 2)
+                    for max_col_size in self.max_col_size
+                )
                 return format_string + "\n", len(self.max_col_size)
 
             def expandlist(self, list, n):
@@ -1017,7 +1029,9 @@ class Qtile(CommandObject):
 
             def __str__(self):
                 format, n = self.getformat()
-                return "".join([format % tuple(self.expandlist(row, n)) for row in self.rows])
+                return "".join(
+                    [format % tuple(self.expandlist(row, n)) for row in self.rows]
+                )
 
         result = FormatTable()
         result.add(["KeySym", "Mod", "Command", "Desc"])
@@ -1026,13 +1040,23 @@ class Qtile(CommandObject):
         for (ks, kmm), k in self.keys_map.items():
             if not k.commands:
                 continue
-            name = ", ".join(xcbq.rkeysyms.get(ks, ("<unknown>", )))
+            name = ", ".join(xcbq.rkeysyms.get(ks, ("<unknown>",)))
             modifiers = ", ".join(xcbq.translate_modifiers(kmm))
             allargs = ", ".join(
-                [repr(value) for value in k.commands[0].args] +
-                ["%s = %s" % (keyword, repr(value)) for keyword, value in k.commands[0].kwargs.items()]
+                [repr(value) for value in k.commands[0].args]
+                + [
+                    "%s = %s" % (keyword, repr(value))
+                    for keyword, value in k.commands[0].kwargs.items()
+                ]
             )
-            rows.append((name, str(modifiers), "{0:s}({1:s})".format(k.commands[0].name, allargs), k.desc))
+            rows.append(
+                (
+                    name,
+                    str(modifiers),
+                    "{0:s}({1:s})".format(k.commands[0].name, allargs),
+                    k.desc,
+                )
+            )
         rows.sort()
         for row in rows:
             result.add(row)
@@ -1088,20 +1112,23 @@ class Qtile(CommandObject):
 
     def cmd_screens(self):
         """Return a list of dictionaries providing information on all screens"""
-        lst = [dict(
-            index=i.index,
-            group=i.group.name if i.group is not None else None,
-            x=i.x,
-            y=i.y,
-            width=i.width,
-            height=i.height,
-            gaps=dict(
-                top=i.top.geometry() if i.top else None,
-                bottom=i.bottom.geometry() if i.bottom else None,
-                left=i.left.geometry() if i.left else None,
-                right=i.right.geometry() if i.right else None,
+        lst = [
+            dict(
+                index=i.index,
+                group=i.group.name if i.group is not None else None,
+                x=i.x,
+                y=i.y,
+                width=i.width,
+                height=i.height,
+                gaps=dict(
+                    top=i.top.geometry() if i.top else None,
+                    bottom=i.bottom.geometry() if i.bottom else None,
+                    left=i.left.geometry() if i.left else None,
+                    right=i.right.geometry() if i.right else None,
+                ),
             )
-        ) for i in self.screens]
+            for i in self.screens
+        ]
         return lst
 
     def cmd_simulate_keypress(self, modifiers, key):
@@ -1147,7 +1174,9 @@ class Qtile(CommandObject):
         try:
             self.config.load()
         except Exception as error:
-            logger.error("Preventing restart because of a configuration error: {}".format(error))
+            logger.error(
+                "Preventing restart because of a configuration error: {}".format(error)
+            )
             send_notification("Configuration error", str(error.__context__))
             return
         self.restart()
@@ -1276,14 +1305,16 @@ class Qtile(CommandObject):
     def cmd_windows(self):
         """Return info for each client window"""
         return [
-            i.info() for i in self.windows_map.values()
+            i.info()
+            for i in self.windows_map.values()
             if not isinstance(i, window.Internal)
         ]
 
     def cmd_internal_windows(self):
         """Return info for each internal window (bars, for example)"""
         return [
-            i.info() for i in self.windows_map.values()
+            i.info()
+            for i in self.windows_map.values()
             if isinstance(i, window.Internal)
         ]
 
@@ -1303,8 +1334,10 @@ class Qtile(CommandObject):
         indexa = self.groups.index(self.groups_map[groupa])
         indexb = self.groups.index(self.groups_map[groupb])
 
-        self.groups[indexa], self.groups[indexb] = \
-            self.groups[indexb], self.groups[indexa]
+        self.groups[indexa], self.groups[indexb] = (
+            self.groups[indexb],
+            self.groups[indexa],
+        )
         hook.fire("setgroup")
 
         # update window _NET_WM_DESKTOP
@@ -1334,12 +1367,7 @@ class Qtile(CommandObject):
             logger.error("No widget named '{0:s}' present.".format(widget))
             return
 
-        mb.start_input(
-            prompt,
-            self.find_window,
-            "window",
-            strict_completer=True
-        )
+        mb.start_input(prompt, self.find_window, "window", strict_completer=True)
 
     def cmd_next_urgent(self):
         """Focus next window with urgent hint"""
@@ -1381,6 +1409,7 @@ class Qtile(CommandObject):
         widget :
             Name of the prompt widget (default: "prompt")
         """
+
         def f(group):
             if group:
                 try:
@@ -1395,8 +1424,9 @@ class Qtile(CommandObject):
 
         mb.start_input(prompt, f, "group", strict_completer=True)
 
-    def cmd_spawncmd(self, prompt="spawn", widget="prompt",
-                     command="%s", complete="cmd"):
+    def cmd_spawncmd(
+        self, prompt="spawn", widget="prompt", command="%s", complete="cmd"
+    ):
         """Spawn a command using a prompt widget, with tab-completion.
 
         Parameters
@@ -1410,17 +1440,20 @@ class Qtile(CommandObject):
         complete :
             Tab completion function (default: "cmd")
         """
+
         def f(args):
             if args:
                 self.cmd_spawn(command % args)
+
         try:
             mb = self.widgets_map[widget]
             mb.start_input(prompt, f, complete)
         except KeyError:
             logger.error("No widget named '{0:s}' present.".format(widget))
 
-    def cmd_qtilecmd(self, prompt="command",
-                     widget="prompt", messenger="xmessage") -> None:
+    def cmd_qtilecmd(
+        self, prompt="command", widget="prompt", messenger="xmessage"
+    ) -> None:
         """Execute a Qtile command using the client syntax
 
         Tab completion aids navigation of the command tree
@@ -1435,6 +1468,7 @@ class Qtile(CommandObject):
             Command to display output, set this to None to disable (default:
             "xmessage")
         """
+
         def f(cmd):
             if cmd:
                 # c here is used in eval() below
@@ -1455,6 +1489,7 @@ class Qtile(CommandObject):
                     result = None
                 if result is not None:
                     from pprint import pformat
+
                     message = pformat(result)
                     if messenger:
                         self.cmd_spawn('{0:s} "{1:s}"'.format(messenger, message))
@@ -1500,6 +1535,7 @@ class Qtile(CommandObject):
 
     def cmd_run_external(self, full_path):
         """Run external Python script"""
+
         def format_error(path, e):
             s = """Can't call "main" from "{path}"\n\t{err_name}: {err}"""
             return s.format(path=path, err_name=e.__class__.__name__, err=e)
@@ -1543,7 +1579,8 @@ class Qtile(CommandObject):
                 self.current_group.layout_all()
             else:
                 logger.warning(
-                    "Not found bar in position '%s' for hide/show." % position)
+                    "Not found bar in position '%s' for hide/show." % position
+                )
         elif position == "all":
             screen = self.current_screen
             is_show = None

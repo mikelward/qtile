@@ -48,7 +48,11 @@ class CommandSet(Dmenu):
 
     defaults = [
         ("commands", None, "dictionary of commands where key is runable command"),
-        ("pre_commands", None, "list of commands to be executed before getting dmenu answer"),
+        (
+            "pre_commands",
+            None,
+            "list of commands to be executed before getting dmenu answer",
+        ),
     ]
 
     def __init__(self, **config):

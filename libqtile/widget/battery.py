@@ -55,12 +55,10 @@ class BatteryState(Enum):
     UNKNOWN = 5
 
 
-BatteryStatus = NamedTuple("BatteryStatus", [
-    ("state", BatteryState),
-    ("percent", float),
-    ("power", float),
-    ("time", int),
-])
+BatteryStatus = NamedTuple(
+    "BatteryStatus",
+    [("state", BatteryState), ("percent", float), ("power", float), ("time", int),],
+)
 
 
 class _Battery(ABC):
@@ -68,6 +66,7 @@ class _Battery(ABC):
         Battery interface class specifying what member functions a
         battery implementation should provide.
     """
+
     @abstractclassmethod
     def update_status(self) -> BatteryStatus:
         """Read the battery status
@@ -142,15 +141,13 @@ class _FreeBSDBattery(_Battery):
         else:
             raise RuntimeError('Could not get battery percentage!')
 
-        power_re = re.search(r'Present rate:\t+(?:[0-9]+ mA )*\(?([0-9]+) mW',
-                             info)
+        power_re = re.search(r'Present rate:\t+(?:[0-9]+ mA )*\(?([0-9]+) mW', info)
         if power_re:
             power = float(power_re.group(1)) / 1000
         else:
             raise RuntimeError('Could not get battery power!')
 
-        time_re = re.search(r'Remaining time:\t+([0-9]+:[0-9]+|unknown)',
-                            info)
+        time_re = re.search(r'Remaining time:\t+([0-9]+:[0-9]+|unknown)', info)
         if time_re:
             if time_re.group(1) == 'unknown':
                 time = 0
@@ -168,23 +165,23 @@ class _LinuxBattery(_Battery, configurable.Configurable):
         (
             'status_file',
             None,
-            'Name of status file in /sys/class/power_supply/battery_name'
+            'Name of status file in /sys/class/power_supply/battery_name',
         ),
         (
             'energy_now_file',
             None,
-            'Name of file with the current energy in /sys/class/power_supply/battery_name'
+            'Name of file with the current energy in /sys/class/power_supply/battery_name',
         ),
         (
             'energy_full_file',
             None,
-            'Name of file with the maximum energy in /sys/class/power_supply/battery_name'
+            'Name of file with the maximum energy in /sys/class/power_supply/battery_name',
         ),
         (
             'power_now_file',
             None,
-            'Name of file with the current power draw in /sys/class/power_supply/battery_name'
-        )
+            'Name of file with the current power draw in /sys/class/power_supply/battery_name',
+        ),
     ]
 
     filenames = {}  # type: Dict
@@ -200,9 +197,13 @@ class _LinuxBattery(_Battery, configurable.Configurable):
     }
 
     def __init__(self, **config):
-        _LinuxBattery.defaults.append(('battery',
-                                       self._get_battery_name(),
-                                       'ACPI name of a battery, usually BAT0'))
+        _LinuxBattery.defaults.append(
+            (
+                'battery',
+                self._get_battery_name(),
+                'ACPI name of a battery, usually BAT0',
+            )
+        )
 
         configurable.Configurable.__init__(self, **config)
         self.add_defaults(_LinuxBattery.defaults)
@@ -284,7 +285,7 @@ class _LinuxBattery(_Battery, configurable.Configurable):
         if now_unit != full_unit:
             raise RuntimeError("Current and full energy units do not match")
         if full == 0:
-            percent = 0.
+            percent = 0.0
         else:
             percent = now / full
 
@@ -306,6 +307,7 @@ class _LinuxBattery(_Battery, configurable.Configurable):
 
 class Battery(base.ThreadedPollText):
     """A text-based battery monitoring widget currently supporting FreeBSD"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('charge_char', '^', 'Character to indicate the battery is charging'),
@@ -313,10 +315,22 @@ class Battery(base.ThreadedPollText):
         ('full_char', '=', 'Character to indicate the battery is full'),
         ('empty_char', 'x', 'Character to indicate the battery is empty'),
         ('unknown_char', '?', 'Character to indicate the battery status is unknown'),
-        ('format', '{char} {percent:2.0%} {hour:d}:{min:02d} {watt:.2f} W', 'Display format'),
-        ('hide_threshold', None, 'Hide the text when there is enough energy 0 <= x < 1'),
+        (
+            'format',
+            '{char} {percent:2.0%} {hour:d}:{min:02d} {watt:.2f} W',
+            'Display format',
+        ),
+        (
+            'hide_threshold',
+            None,
+            'Hide the text when there is enough energy 0 <= x < 1',
+        ),
         ('show_short_text', True, 'Show "Full" or "Empty" rather than formated text'),
-        ('low_percentage', 0.10, "Indicates when to use the low_foreground color 0 < x < 1"),
+        (
+            'low_percentage',
+            0.10,
+            "Indicates when to use the low_foreground color 0 < x < 1",
+        ),
         ('low_foreground', 'FF0000', 'Font color on low battery'),
         ('update_interval', 60, 'Seconds between status updates'),
         ('battery', 0, 'Which battery should be monitored (battery number or name)'),
@@ -325,8 +339,10 @@ class Battery(base.ThreadedPollText):
 
     def __init__(self, **config) -> None:
         if "update_delay" in config:
-            warnings.warn("Change from using update_delay to update_interval for battery widget, removed in 0.15",
-                          DeprecationWarning)
+            warnings.warn(
+                "Change from using update_delay to update_interval for battery widget, removed in 0.15",
+                DeprecationWarning,
+            )
             config["update_interval"] = config.pop("update_delay")
 
         base.ThreadedPollText.__init__(self, **config)
@@ -360,7 +376,9 @@ class Battery(base.ThreadedPollText):
             percent = int(status.percent * 100)
             if percent < self.notify_below:
                 if not self._has_notified:
-                    send_notification("Warning", "Battery at {0}%".format(percent), urgent=True)
+                    send_notification(
+                        "Warning", "Battery at {0}%".format(percent), urgent=True
+                    )
                     self._has_notified = True
             elif self._has_notified:
                 self._has_notified = False
@@ -384,7 +402,10 @@ class Battery(base.ThreadedPollText):
             return ''
 
         if self.layout is not None:
-            if status.state == BatteryState.DISCHARGING and status.percent < self.low_percentage:
+            if (
+                status.state == BatteryState.DISCHARGING
+                and status.percent < self.low_percentage
+            ):
                 self.layout.colour = self.low_foreground
             else:
                 self.layout.colour = self.foreground
@@ -397,8 +418,9 @@ class Battery(base.ThreadedPollText):
             if self.show_short_text:
                 return "Full"
             char = self.full_char
-        elif status.state == BatteryState.EMPTY or \
-                (status.state == BatteryState.UNKNOWN and status.percent == 0):
+        elif status.state == BatteryState.EMPTY or (
+            status.state == BatteryState.UNKNOWN and status.percent == 0
+        ):
             if self.show_short_text:
                 return "Empty"
             char = self.empty_char
@@ -409,11 +431,7 @@ class Battery(base.ThreadedPollText):
         minute = (status.time // 60) % 60
 
         return self.format.format(
-            char=char,
-            percent=status.percent,
-            watt=status.power,
-            hour=hour,
-            min=minute
+            char=char, percent=status.percent, watt=status.power, hour=hour, min=minute
         )
 
 
@@ -448,8 +466,10 @@ class BatteryIcon(base._TextBox):
 
     def __init__(self, **config) -> None:
         if "update_delay" in config:
-            warnings.warn("Change from using update_delay to update_interval for battery widget, removed in 0.15",
-                          DeprecationWarning)
+            warnings.warn(
+                "Change from using update_delay to update_interval for battery widget, removed in 0.15",
+                DeprecationWarning,
+            )
             config["update_interval"] = config.pop("update_delay")
 
         base._TextBox.__init__(self, "BAT", bar.CALCULATED, **config)
@@ -512,11 +532,11 @@ class BatteryIcon(base._TextBox):
         key = 'battery'
 
         percent = status.percent
-        if percent < .2:
+        if percent < 0.2:
             key += '-caution'
-        elif percent < .4:
+        elif percent < 0.4:
             key += '-low'
-        elif percent < .8:
+        elif percent < 0.8:
             key += '-good'
         else:
             key += '-full'

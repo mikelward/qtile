@@ -86,6 +86,7 @@ AllButtonsMask = 0b11111 << 8
 ButtonMotionMask = 1 << 13
 ButtonReleaseMask = 1 << 3
 
+# fmt: off
 NormalHintsFlags = {
     "USPosition": 1,     # User-specified x, y
     "USSize": 2,         # User-specified width, height
@@ -98,7 +99,9 @@ NormalHintsFlags = {
     "PBaseSize": 256,    # Program-specified base size
     "PWinGravity": 512,  # Program-specified window gravity
 }
+# fmt: on
 
+# fmt: off
 HintsFlags = {
     "InputHint": 1,          # input
     "StateHint": 2,          # initial_state
@@ -110,6 +113,7 @@ HintsFlags = {
     "MessageHint": 128,      # (this bit is obsolete)
     "UrgencyHint": 256,      # urgency
 }
+# fmt: on
 
 # http://standards.freedesktop.org/wm-spec/latest/ar01s05.html#idm139870830002400
 WindowTypes = {
@@ -467,10 +471,10 @@ class Window:
     def warp_pointer(self, x, y):
         """Warps the pointer to the location `x`, `y` on the window"""
         self.conn.conn.core.WarpPointer(
-            0, self.wid,  # src_window, dst_window
-            0, 0,         # src_x, src_y
-            0, 0,         # src_width, src_height
-            x, y          # dest_x, dest_y
+            src_window=0, dst_window=self.wid,
+            src_x=0, src_y=0,
+            src_width=0, src_height=0,
+            dest_x=x, dest_y=y
         )
 
     def get_name(self):

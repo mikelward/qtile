@@ -48,8 +48,11 @@ class BitcoinTicker(GenPollUrl):
     orientations = base.ORIENTATION_HORIZONTAL
 
     defaults = [
-        ('currency', _DEFAULT_CURRENCY.strip(),
-            'The currency the value that bitcoin is displayed in'),
+        (
+            'currency',
+            _DEFAULT_CURRENCY.strip(),
+            'The currency the value that bitcoin is displayed in',
+        ),
     ]
 
     def __init__(self, **config):
@@ -67,4 +70,6 @@ class BitcoinTicker(GenPollUrl):
         return self.QUERY_URL % self.currency.lower()
 
     def parse(self, body):
-        return "BTC: {symbol}{amount}".format(symbol=self.symbol, amount=body['data']['amount'])
+        return "BTC: {symbol}{amount}".format(
+            symbol=self.symbol, amount=body['data']['amount']
+        )

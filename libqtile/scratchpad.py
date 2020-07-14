@@ -58,11 +58,13 @@ class WindowVisibilityToggler:
         self.show()
 
     def info(self):
-        return dict(window=self.window.info(),
-                    scratchpad_name=self.scratchpad_name,
-                    visible=self.visible,
-                    on_focus_lost_hide=self.on_focus_lost_hide,
-                    warp_pointer=self.warp_pointer)
+        return dict(
+            window=self.window.info(),
+            scratchpad_name=self.scratchpad_name,
+            visible=self.visible,
+            on_focus_lost_hide=self.on_focus_lost_hide,
+            warp_pointer=self.warp_pointer,
+        )
 
     @property
     def visible(self):
@@ -73,14 +75,16 @@ class WindowVisibilityToggler:
         """
         if self.window.group is None:
             return False
-        return (self.window.group.name != self.scratchpad_name and
-                self.window.group is self.window.qtile.current_group)
+        return (
+            self.window.group.name != self.scratchpad_name
+            and self.window.group is self.window.qtile.current_group
+        )
 
     def toggle(self):
         """
         Toggle the visibility of associated window. Either show() or hide().
         """
-        if (not self.visible or not self.shown):
+        if not self.visible or not self.shown:
             self.show()
         else:
             self.hide()
@@ -130,13 +134,15 @@ class WindowVisibilityToggler:
         try:
             hook.unsubscribe.client_focus(self.on_focus_change)
         except utils.QtileError as err:
-            logger.exception("Scratchpad failed to unsubscribe on_focus_change"
-                             ": %s" % err)
+            logger.exception(
+                "Scratchpad failed to unsubscribe on_focus_change" ": %s" % err
+            )
         try:
             hook.unsubscribe.setgroup(self.on_focus_change)
         except utils.QtileError as err:
-            logger.exception("Scratchpad failed to unsubscribe on_focus_change"
-                             ": %s" % err)
+            logger.exception(
+                "Scratchpad failed to unsubscribe on_focus_change" ": %s" % err
+            )
 
     def on_focus_change(self, *args, **kwargs):
         """
@@ -146,8 +152,10 @@ class WindowVisibilityToggler:
         """
         if self.shown:
             current_group = self.window.qtile.current_group
-            if (self.window.group is not current_group or
-                    self.window is not current_group.current_window):
+            if (
+                self.window.group is not current_group
+                or self.window is not current_group.current_window
+            ):
                 if self.on_focus_lost_hide:
                     self.hide()
 
@@ -158,6 +166,7 @@ class DropDownToggler(WindowVisibilityToggler):
     each time it is shown at desired location.
     For example this can be used to create a quake-like terminal.
     """
+
     def __init__(self, window, scratchpad_name, ddconfig):
         self.name = ddconfig.name
         self.x = ddconfig.x
@@ -166,16 +175,20 @@ class DropDownToggler(WindowVisibilityToggler):
         self.height = ddconfig.height
         window.set_opacity(ddconfig.opacity)
         WindowVisibilityToggler.__init__(
-            self, scratchpad_name, window, ddconfig.on_focus_lost_hide, ddconfig.warp_pointer
+            self,
+            scratchpad_name,
+            window,
+            ddconfig.on_focus_lost_hide,
+            ddconfig.warp_pointer,
         )
 
     def info(self):
         info = WindowVisibilityToggler.info(self)
-        info.update(dict(name=self.name,
-                         x=self.x,
-                         y=self.y,
-                         width=self.width,
-                         height=self.height))
+        info.update(
+            dict(
+                name=self.name, x=self.x, y=self.y, width=self.width, height=self.height
+            )
+        )
         return info
 
     def show(self):
@@ -210,6 +223,7 @@ class ScratchPad(group._Group):
     The ScratchPad, by default, has no label and thus is not shown in
     GroupBox widget.
     """
+
     def __init__(self, name='scratchpad', dropdowns=[], label=''):
         group._Group.__init__(self, name, label=label)
         self._dropdownconfig = {dd.name: dd for dd in dropdowns}
@@ -249,8 +263,9 @@ class ScratchPad(group._Group):
             name = self._spawned.pop(client_pid)
             if not self._spawned:
                 hook.unsubscribe.client_new(self.on_client_new)
-            self.dropdowns[name] = DropDownToggler(client, self.name,
-                                                   self._dropdownconfig[name])
+            self.dropdowns[name] = DropDownToggler(
+                client, self.name, self._dropdownconfig[name]
+            )
             if name in self._to_hide:
                 self.dropdowns[name].hide()
                 self._to_hide.remove(name)

@@ -68,18 +68,18 @@ class Backlight(base.InLoopPollText):
             'brightness_file',
             'brightness',
             'Name of file with the '
-            'current brightness in /sys/class/backlight/backlight_name'
+            'current brightness in /sys/class/backlight/backlight_name',
         ),
         (
             'max_brightness_file',
             'max_brightness',
             'Name of file with the '
-            'maximum brightness in /sys/class/backlight/backlight_name'
+            'maximum brightness in /sys/class/backlight/backlight_name',
         ),
-        ('update_interval', .2, 'The delay in seconds between updates'),
+        ('update_interval', 0.2, 'The delay in seconds between updates'),
         ('step', 10, 'Percent of backlight every scroll changed'),
         ('format', '{percent: 2.0%}', 'Display format'),
-        ('change_command', 'xbacklight -set {0}', 'Execute command to change value')
+        ('change_command', 'xbacklight -set {0}', 'Execute command to change value'),
     ]
 
     def __init__(self, **config):
@@ -130,8 +130,11 @@ class Backlight(base.InLoopPollText):
                 with open(self.brightness_file, 'w') as f:
                     f.write(str(round(value)))
             except PermissionError:
-                logger.warning("Cannot set brightness: no write permission for {0}"
-                               .format(self.brightness_file))
+                logger.warning(
+                    "Cannot set brightness: no write permission for {0}".format(
+                        self.brightness_file
+                    )
+                )
         else:
             self.call_process(shlex.split(self.change_command.format(value)))
 
@@ -148,8 +151,7 @@ class Backlight(base.InLoopPollText):
         elif direction is ChangeDirection.UP:  # up
             new = min(now + self.step, self.max_value)
         if new != now:
-            self.future = self.qtile.run_in_executor(self.change_backlight,
-                                                     new)
+            self.future = self.qtile.run_in_executor(self.change_backlight, new)
 
     def button_press(self, x, y, button):
         if button == 5:

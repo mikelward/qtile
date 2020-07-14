@@ -52,9 +52,12 @@ def terminal_width():
 
 class QSh:
     """Qtile shell instance"""
+
     def __init__(self, client: CommandInterface, completekey="tab") -> None:
         self._client = client
-        self._current_node = command_graph.CommandGraphRoot()  # type: command_graph.CommandGraphNode
+        self._current_node = (
+            command_graph.CommandGraphRoot()
+        )  # type: command_graph.CommandGraphNode
         self._completekey = completekey
         self._builtins = [i[3:] for i in dir(self) if i.startswith("do_")]
         self._termwidth = terminal_width()
@@ -111,7 +114,7 @@ class QSh:
             for i in range(rows):
                 # Because Python array slicing can go beyond the array bounds,
                 # we don't need to be careful with the values here
-                sl = lst[i * cols: (i + 1) * cols]
+                sl = lst[i * cols : (i + 1) * cols]
                 sl = [x + " " * (mx - len(x)) for x in sl]
                 ret.append("  ".join(sl))
         return "\n".join(ret)
@@ -124,7 +127,9 @@ class QSh:
         except CommandError:
             return []
 
-    def _inspect(self, obj: command_graph.CommandGraphNode) -> Tuple[Optional[List[str]], Optional[List[str]]]:
+    def _inspect(
+        self, obj: command_graph.CommandGraphNode
+    ) -> Tuple[Optional[List[str]], Optional[List[str]]]:
         """Returns an (attrs, keys) tuple"""
         if isinstance(obj, command_graph.CommandGraphObject) and obj.selector is None:
             items_call = obj.parent.call("items")
@@ -149,13 +154,17 @@ class QSh:
         Finds and returns the command graph node that is defined relative to
         the current node.
         """
-        root = command_graph.CommandGraphRoot() if path.startswith("/") else self._current_node
+        root = (
+            command_graph.CommandGraphRoot()
+            if path.startswith("/")
+            else self._current_node
+        )
         parts = [i for i in path.split("/") if i]
         return self._find_node(root, *parts)
 
-    def _find_node(self,
-                   src: command_graph.CommandGraphNode,
-                   *paths: str) -> Optional[command_graph.CommandGraphNode]:
+    def _find_node(
+        self, src: command_graph.CommandGraphNode, *paths: str
+    ) -> Optional[command_graph.CommandGraphNode]:
         """Find an object in the command graph
 
         Return the object in the command graph at the specified path relative
@@ -269,12 +278,14 @@ class QSh:
             ]
             cmds = self._commands
             if cmds:
-                lst.extend([
-                    "",
-                    "Commands for this object",
-                    "========================",
-                    self.columnize(cmds),
-                ])
+                lst.extend(
+                    [
+                        "",
+                        "Commands for this object",
+                        "========================",
+                        self.columnize(cmds),
+                    ]
+                )
             return "\n".join(lst)
         elif arg in self._commands:
             call = self._current_node.call("doc")

@@ -31,34 +31,26 @@ from libqtile import command_graph, ipc
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Run a command applying rules to the new windows")
-    parser.add_argument(
-        '-s',
-        '--socket',
-        help='Use specified communication socket.')
+        description="Run a command applying rules to the new windows"
+    )
+    parser.add_argument('-s', '--socket', help='Use specified communication socket.')
     parser.add_argument(
         '-i',
         '--intrusive',
         action='store_true',
-        help='If the new window should be intrusive.')
+        help='If the new window should be intrusive.',
+    )
     parser.add_argument(
-        '-f',
-        '--float',
-        action='store_true',
-        help='If the new window should be float.')
+        '-f', '--float', action='store_true', help='If the new window should be float.'
+    )
     parser.add_argument(
         '-b',
         '--dont-break',
         action='store_true',
-        help='Do not break on match (keep applying rules).')
-    parser.add_argument(
-        '-g',
-        '--group',
-        help='Set the window group.')
-    parser.add_argument(
-        'cmd',
-        nargs=argparse.REMAINDER,
-        help='Command to execute')
+        help='Do not break on match (keep applying rules).',
+    )
+    parser.add_argument('-g', '--group', help='Set the window group.')
+    parser.add_argument('cmd', nargs=argparse.REMAINDER, help='Command to execute')
 
     opts = parser.parse_args()
     if not opts.cmd:
@@ -78,8 +70,12 @@ def main() -> None:
 
     proc = subprocess.Popen(opts.cmd)
     match_args = {"net_wm_pid": [proc.pid]}
-    rule_args = {"float": opts.float, "intrusive": opts.intrusive,
-                 "group": opts.group, "break_on_match": not opts.dont_break}
+    rule_args = {
+        "float": opts.float,
+        "intrusive": opts.intrusive,
+        "group": opts.group,
+        "break_on_match": not opts.dont_break,
+    }
 
     cmd = root.navigate("add_rule", None)
     assert isinstance(cmd, command_graph.CommandGraphCall)

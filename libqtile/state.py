@@ -29,6 +29,7 @@ class QtileState:
     Primarily used for restoring state across restarts; any additional state
     which doesn't fit nicely into X atoms can go here.
     """
+
     def __init__(self, qtile):
         # Note: window state is saved and restored via _NET_WM_STATE, so
         # the only thing we need to restore here is the layout and screen

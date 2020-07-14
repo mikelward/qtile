@@ -64,6 +64,7 @@ class RunCommand(_Extension):
     Also consider simply using lazy.spawn() or writing a
     `client <http://docs.qtile.org/en/latest/manual/commands/scripting.html>`_.
     """
+
     defaults = [
         # NOTE: Do not use a list as a default value, since it would be shared
         #       among all the objects inheriting this class, and if one of them

@@ -52,6 +52,7 @@ class Volume(base._TextBox):
 
     If theme_path is set it draw widget as icons.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("cardid", None, "Card Id"),
@@ -60,15 +61,23 @@ class Volume(base._TextBox):
         ("padding", 3, "Padding left and right. Calculated if None."),
         ("update_interval", 0.2, "Update time in seconds."),
         ("theme_path", None, "Path of the icons"),
-        ("emoji", False, "Use emoji to display volume states, only if ``theme_path`` is not set."
-                         "The specified font needs to contain the correct unicode characters."),
+        (
+            "emoji",
+            False,
+            "Use emoji to display volume states, only if ``theme_path`` is not set."
+            "The specified font needs to contain the correct unicode characters.",
+        ),
         ("mute_command", None, "Mute command"),
         ("volume_app", None, "App to control volume"),
         ("volume_up_command", None, "Volume up command"),
         ("volume_down_command", None, "Volume down command"),
         ("get_volume_command", None, "Command to get the current volume"),
-        ("step", 2, "Volume change for up an down commands in percentage."
-                    "Only used if ``volume_up_command`` and ``volume_down_command`` are not set.")
+        (
+            "step",
+            2,
+            "Volume change for up an down commands in percentage."
+            "Only used if ``volume_up_command`` and ``volume_down_command`` are not set.",
+        ),
     ]
 
     def __init__(self, **config):
@@ -88,10 +97,10 @@ class Volume(base._TextBox):
     def create_amixer_command(self, *args):
         cmd = ['amixer']
 
-        if (self.cardid is not None):
+        if self.cardid is not None:
             cmd.extend(['-c', str(self.cardid)])
 
-        if (self.device is not None):
+        if self.device is not None:
             cmd.extend(['-D', str(self.device)])
 
         cmd.extend([x for x in args])
@@ -102,26 +111,27 @@ class Volume(base._TextBox):
             if self.volume_down_command is not None:
                 subprocess.call(self.volume_down_command, shell=True)
             else:
-                subprocess.call(self.create_amixer_command('-q',
-                                                           'sset',
-                                                           self.channel,
-                                                           '{}%-'.format(self.step)))
+                subprocess.call(
+                    self.create_amixer_command(
+                        '-q', 'sset', self.channel, '{}%-'.format(self.step)
+                    )
+                )
         elif button == BUTTON_UP:
             if self.volume_up_command is not None:
                 subprocess.call(self.volume_up_command, shell=True)
             else:
-                subprocess.call(self.create_amixer_command('-q',
-                                                           'sset',
-                                                           self.channel,
-                                                           '{}%+'.format(self.step)))
+                subprocess.call(
+                    self.create_amixer_command(
+                        '-q', 'sset', self.channel, '{}%+'.format(self.step)
+                    )
+                )
         elif button == BUTTON_MUTE:
             if self.mute_command is not None:
                 subprocess.call(self.mute_command, shell=True)
             else:
-                subprocess.call(self.create_amixer_command('-q',
-                                                           'sset',
-                                                           self.channel,
-                                                           'toggle'))
+                subprocess.call(
+                    self.create_amixer_command('-q', 'sset', self.channel, 'toggle')
+                )
         elif button == BUTTON_RIGHT:
             if self.volume_app is not None:
                 subprocess.Popen(self.volume_app, shell=True)
@@ -169,6 +179,7 @@ class Volume(base._TextBox):
 
     def setup_images(self):
         from libqtile import images
+
         names = (
             'audio-volume-high',
             'audio-volume-low',
@@ -185,8 +196,7 @@ class Volume(base._TextBox):
 
     def get_volume(self):
         try:
-            get_volume_cmd = self.create_amixer_command('sget',
-                                                        self.channel)
+            get_volume_cmd = self.create_amixer_command('sget', self.channel)
 
             if self.get_volume_command:
                 get_volume_cmd = self.get_volume_command

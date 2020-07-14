@@ -3,7 +3,9 @@ from libqtile.log_utils import logger
 try:
     from libqtile.backend.x11._ffi_xcursors import ffi
 except ImportError:
-    raise ImportError("No module named libqtile.backend.x11._ffi_xcursors, be sure to run `./scripts/ffibuild`")
+    raise ImportError(
+        "No module named libqtile.backend.x11._ffi_xcursors, be sure to run `./scripts/ffibuild`"
+    )
 
 
 # Stolen from samurai-x
@@ -91,7 +93,7 @@ class Cursors(dict):
             (b'umbrella', 146),
             (b'ur_angle', 148),
             (b'watch', 150),
-            (b'xterm', 152)
+            (b'xterm', 152),
         )
 
         self.xcursor = self._setup_xcursor_binding()
@@ -115,8 +117,7 @@ class Cursors(dict):
         conn = self.conn.conn
         screen_pointer = conn.get_screen_pointers()[0]
         self._cursor_ctx = ffi.new('xcb_cursor_context_t **')
-        xcursor.xcb_cursor_context_new(conn._conn, screen_pointer,
-                                       self._cursor_ctx)
+        xcursor.xcb_cursor_context_new(conn._conn, screen_pointer, self._cursor_ctx)
 
         return xcursor
 
@@ -136,10 +137,7 @@ class Cursors(dict):
         self.conn.conn.core.OpenFont(fid, len("cursor"), "cursor")
         cursor = self.conn.conn.generate_id()
         self.conn.conn.core.CreateGlyphCursor(
-            cursor, fid, fid,
-            cursor_font, cursor_font + 1,
-            0, 0, 0,
-            65535, 65535, 65535
+            cursor, fid, fid, cursor_font, cursor_font + 1, 0, 0, 0, 65535, 65535, 65535
         )
         return cursor
 

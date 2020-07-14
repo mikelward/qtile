@@ -89,7 +89,7 @@ class _IPC:
             assert len(data) >= HDRLEN
             size = struct.unpack(HDRFORMAT, data[:HDRLEN])[0]
             assert size >= len(data[HDRLEN:])
-            return marshal.loads(data[HDRLEN:HDRLEN + size]), False
+            return marshal.loads(data[HDRLEN : HDRLEN + size]), False
         except AssertionError as e:
             raise IPCError(
                 "error reading reply! (probably the socket was disconnected)"

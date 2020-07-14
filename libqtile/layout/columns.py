@@ -34,10 +34,8 @@ class _Column(_ClientList):
     def info(self):
         info = _ClientList.info(self)
         info.update(
-            dict(
-                heights=[self.heights[c] for c in self.clients],
-                split=self.split,
-            ))
+            dict(heights=[self.heights[c] for c in self.clients], split=self.split,)
+        )
         return info
 
     def toggle_split(self):
@@ -67,11 +65,14 @@ class _Column(_ClientList):
 
     def __str__(self):
         cur = self.current
-        return "_Column: " + ", ".join([
-            "[%s: %d]" % (c.name, self.heights[c])
-            if c == cur else "%s: %d" % (c.name, self.heights[c])
-            for c in self.clients
-        ])
+        return "_Column: " + ", ".join(
+            [
+                "[%s: %d]" % (c.name, self.heights[c])
+                if c == cur
+                else "%s: %d" % (c.name, self.heights[c])
+                for c in self.clients
+            ]
+        )
 
 
 class Columns(Layout):
@@ -107,29 +108,44 @@ class Columns(Layout):
         Key([mod], "Return", lazy.layout.toggle_split()),
         Key([mod], "n", lazy.layout.normalize()),
     """
+
     defaults = [
         ("name", "columns", "Name of this layout."),
         ("border_focus", "#881111", "Border colour for the focused window."),
         ("border_normal", "#220000", "Border colour for un-focused windows."),
-        ("border_focus_stack", "#881111",
-         "Border colour for the focused window in stacked columns."),
-        ("border_normal_stack", "#220000",
-         "Border colour for un-focused windows in stacked columns."),
+        (
+            "border_focus_stack",
+            "#881111",
+            "Border colour for the focused window in stacked columns.",
+        ),
+        (
+            "border_normal_stack",
+            "#220000",
+            "Border colour for un-focused windows in stacked columns.",
+        ),
         ("border_width", 2, "Border width."),
         ("margin", 0, "Margin of the layout."),
         ("split", True, "New columns presentation mode."),
         ("num_columns", 2, "Preferred number of columns."),
         ("grow_amount", 10, "Amount by which to grow a window/column."),
         ("fair", False, "Add new windows to the column with least windows."),
-        ("insert_position", 0,
-         "Position relative to the current window where new ones are inserted "
-         "(0 means right above the current window, 1 means right after)."),
-        ("wrap_focus_columns", True,
-         "Wrap the screen when moving focus across columns."),
-        ("wrap_focus_rows", True,
-         "Wrap the screen when moving focus across rows."),
-        ("wrap_focus_stacks", True,
-         "Wrap the screen when moving focus across stacked."),
+        (
+            "insert_position",
+            0,
+            "Position relative to the current window where new ones are inserted "
+            "(0 means right above the current window, 1 means right after).",
+        ),
+        (
+            "wrap_focus_columns",
+            True,
+            "Wrap the screen when moving focus across columns.",
+        ),
+        ("wrap_focus_rows", True, "Wrap the screen when moving focus across rows."),
+        (
+            "wrap_focus_stacks",
+            True,
+            "Wrap the screen when moving focus across stacked.",
+        ),
     ]
 
     def __init__(self, **config):
@@ -220,11 +236,13 @@ class Columns(Layout):
             client.hide()
             return
         if client.has_focus:
-            color = self.group.qtile.color_pixel(self.border_focus if col.split
-                                                 else self.border_focus_stack)
+            color = self.group.qtile.color_pixel(
+                self.border_focus if col.split else self.border_focus_stack
+            )
         else:
-            color = self.group.qtile.color_pixel(self.border_normal if col.split
-                                                 else self.border_normal_stack)
+            color = self.group.qtile.color_pixel(
+                self.border_normal if col.split else self.border_normal_stack
+            )
         if len(self.columns) == 1 and (len(col) == 1 or not col.split):
             border = 0
         else:
@@ -237,8 +255,7 @@ class Columns(Layout):
                 if client == c:
                     break
                 pos += col.heights[c]
-            height = int(
-                0.5 + col.heights[client] * screen.height * 0.01 / len(col))
+            height = int(0.5 + col.heights[client] * screen.height * 0.01 / len(col))
             y = screen.y + int(0.5 + pos * screen.height * 0.01 / len(col))
             client.place(
                 x,
@@ -247,7 +264,8 @@ class Columns(Layout):
                 height - 2 * border,
                 border,
                 color,
-                margin=self.margin)
+                margin=self.margin,
+            )
             client.unhide()
         elif client == col.cw:
             client.place(
@@ -257,7 +275,8 @@ class Columns(Layout):
                 screen.height - 2 * border,
                 border,
                 color,
-                margin=self.margin)
+                margin=self.margin,
+            )
             client.unhide()
         else:
             client.hide()
@@ -312,7 +331,7 @@ class Columns(Layout):
                 self.current = (self.current - 1) % len(self.columns)
         else:
             if self.current > 0:
-                self.current = (self.current - 1)
+                self.current = self.current - 1
         self.group.focus(self.cc.cw, True)
 
     def cmd_right(self):
@@ -321,7 +340,7 @@ class Columns(Layout):
                 self.current = (self.current + 1) % len(self.columns)
         else:
             if len(self.columns) - 1 > self.current:
-                self.current = (self.current + 1)
+                self.current = self.current + 1
         self.group.focus(self.cc.cw, True)
 
     def want_wrap(self, col):

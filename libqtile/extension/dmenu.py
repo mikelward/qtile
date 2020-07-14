@@ -30,7 +30,11 @@ class Dmenu(base.RunCommand):
     """
 
     defaults = [
-        ("dmenu_font", None, "override the default 'font' and 'fontsize' options for dmenu"),
+        (
+            "dmenu_font",
+            None,
+            "override the default 'font' and 'fontsize' options for dmenu",
+        ),
         # NOTE: Do not use a list as a default value, since it would be shared
         #       among all the objects inheriting this class, and if one of them
         #       modified it, all the other objects would see the modified list;
@@ -38,9 +42,21 @@ class Dmenu(base.RunCommand):
         ("dmenu_command", 'dmenu', "the dmenu command to be launched"),
         ("dmenu_bottom", False, "dmenu appears at the bottom of the screen"),
         ("dmenu_ignorecase", False, "dmenu matches menu items case insensitively"),
-        ("dmenu_lines", None, "dmenu lists items vertically, with the given number of lines"),
-        ("dmenu_prompt", None, "defines the prompt to be displayed to the left of the input field"),
-        ("dmenu_height", None, "defines the height (only supported by some dmenu forks)"),
+        (
+            "dmenu_lines",
+            None,
+            "dmenu lists items vertically, with the given number of lines",
+        ),
+        (
+            "dmenu_prompt",
+            None,
+            "defines the prompt to be displayed to the left of the input field",
+        ),
+        (
+            "dmenu_height",
+            None,
+            "defines the height (only supported by some dmenu forks)",
+        ),
     ]
 
     def __init__(self, **config):
@@ -145,7 +161,11 @@ class J4DmenuDesktop(Dmenu):
 
     defaults = [
         ("j4dmenu_command", 'j4-dmenu-desktop', "the dmenu command to be launched"),
-        ("j4dmenu_use_xdg_de", False, "read $XDG_CURRENT_DESKTOP to determine the desktop environment"),
+        (
+            "j4dmenu_use_xdg_de",
+            False,
+            "read $XDG_CURRENT_DESKTOP to determine the desktop environment",
+        ),
         ("j4dmenu_display_binary", False, "display binary name after each entry"),
         ("j4dmenu_generic", True, "include the generic name of desktop entries"),
         ("j4dmenu_terminal", None, "terminal emulator used to start terminal apps"),
@@ -159,8 +179,11 @@ class J4DmenuDesktop(Dmenu):
     def _configure(self, qtile):
         Dmenu._configure(self, qtile)
 
-        self.configured_command = [self.j4dmenu_command, '--dmenu',
-                                   " ".join(shlex.quote(arg) for arg in self.configured_command)]
+        self.configured_command = [
+            self.j4dmenu_command,
+            '--dmenu',
+            " ".join(shlex.quote(arg) for arg in self.configured_command),
+        ]
         if self.j4dmenu_use_xdg_de:
             self.configured_command.append("--use-xdg-de")
         if self.j4dmenu_display_binary:
@@ -170,5 +193,4 @@ class J4DmenuDesktop(Dmenu):
         if self.j4dmenu_terminal:
             self.configured_command.extend(("--term", self.j4dmenu_terminal))
         if self.j4dmenu_usage_log:
-            self.configured_command.extend(("--usage-log",
-                                            self.j4dmenu_usage_log))
+            self.configured_command.extend(("--usage-log", self.j4dmenu_usage_log))

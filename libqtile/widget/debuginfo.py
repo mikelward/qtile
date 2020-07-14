@@ -26,6 +26,7 @@ from libqtile.widget import base
 
 class DebugInfo(base._TextBox):
     """Displays debugging infos about selected window"""
+
     orientations = base.ORIENTATION_HORIZONTAL
 
     def __init__(self, **config):
@@ -47,8 +48,11 @@ class DebugInfo(base._TextBox):
             stack_offset = w.group.layout.current_stack_offset
             index = stack.lst.index(w)
             current = stack.current
-            self.text = ("Stack: %s Index: %s Current: %s"
-                         % (stack_offset, index, current))
+            self.text = "Stack: %s Index: %s Current: %s" % (
+                stack_offset,
+                index,
+                current,
+            )
         elif isinstance(w.group.layout, layout.TreeTab):
             node = w.group.layout._nodes[w]
             node_index = node.parent.children.index(node)
@@ -58,8 +62,11 @@ class DebugInfo(base._TextBox):
                 snode = snode.parent
                 level += 1
             section_index = snode.parent.children.index(snode)
-            self.text = ("Level: %s SectionIndex: %s NodeIndex: %s"
-                         % (level, section_index, node_index))
+            self.text = "Level: %s SectionIndex: %s NodeIndex: %s" % (
+                level,
+                section_index,
+                node_index,
+            )
 
         if self.layout.width != old_layout_width:
             self.bar.draw()

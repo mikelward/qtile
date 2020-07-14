@@ -35,7 +35,8 @@ class _WinStack(_ClientList):
 
     def __str__(self):
         return "_WinStack: %s, %s" % (
-            self.cw, str([client.name for client in self.clients])
+            self.cw,
+            str([client.name for client in self.clients]),
         )
 
     def info(self):
@@ -54,6 +55,7 @@ class Stack(Layout):
 
     Unlike the columns layout the number of stacks is fixed.
     """
+
     defaults = [
         ("border_focus", "#0000ff", "Border colour for the focused window."),
         ("border_normal", "#000000", "Border colour for un-focused windows."),
@@ -68,8 +70,9 @@ class Stack(Layout):
     def __init__(self, **config):
         Layout.__init__(self, **config)
         self.add_defaults(Stack.defaults)
-        self.stacks = [_WinStack(autosplit=self.autosplit)
-                       for i in range(self.num_stacks)]
+        self.stacks = [
+            _WinStack(autosplit=self.autosplit) for i in range(self.num_stacks)
+        ]
 
     @property
     def current_stack(self):
@@ -96,7 +99,7 @@ class Stack(Layout):
         return c
 
     def _find_next(self, lst, offset):
-        for i in lst[offset + 1:]:
+        for i in lst[offset + 1 :]:
             if i:
                 return i
         else:
@@ -112,23 +115,17 @@ class Stack(Layout):
             off = min(off, len(self.stacks) - 1)
             self.stacks[off].join(s, 1)
             if self.stacks[off]:
-                self.group.focus(
-                    self.stacks[off].cw,
-                    False
-                )
+                self.group.focus(self.stacks[off].cw, False)
 
     def next_stack(self):
-        n = self._find_next(
-            self.stacks,
-            self.current_stack_offset
-        )
+        n = self._find_next(self.stacks, self.current_stack_offset)
         if n:
             self.group.focus(n.cw, True)
 
     def previous_stack(self):
         n = self._find_next(
             list(reversed(self.stacks)),
-            len(self.stacks) - self.current_stack_offset - 1
+            len(self.stacks) - self.current_stack_offset - 1,
         )
         if n:
             self.group.focus(n.cw, True)
@@ -199,8 +196,7 @@ class Stack(Layout):
             return self.stacks[current_offset].cw
         else:
             n = self._find_next(
-                list(reversed(self.stacks)),
-                len(self.stacks) - current_offset - 1
+                list(reversed(self.stacks)), len(self.stacks) - current_offset - 1
             )
             if n:
                 return n.cw

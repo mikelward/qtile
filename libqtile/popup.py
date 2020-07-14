@@ -28,6 +28,7 @@ class Popup(configurable.Configurable):
     """
     This class can be used to create popup windows that display images and/or text.
     """
+
     defaults = [
         ('opacity', 1.0, 'Opacity of notifications.'),
         ('foreground', '#ffffff', 'Colour of text.'),
@@ -53,9 +54,7 @@ class Popup(configurable.Configurable):
         win.set_property("QTILE_INTERNAL", 1)
         self.win = window.Internal(win, qtile)
         self.win.opacity = self.opacity
-        self.drawer = drawer.Drawer(
-            self.qtile, self.win.window.wid, width, height,
-        )
+        self.drawer = drawer.Drawer(self.qtile, self.win.window.wid, width, height,)
         self.layout = self.drawer.textlayout(
             text='',
             colour=self.foreground,
@@ -70,7 +69,9 @@ class Popup(configurable.Configurable):
         if self.border_width:
             self.win.window.configure(borderwidth=self.border_width)
         if self.corner_radius:
-            self.win.window.round_corners(width, height, self.corner_radius, self.border_width)
+            self.win.window.round_corners(
+                width, height, self.corner_radius, self.border_width
+            )
 
         self.win.handle_Expose = self._handle_Expose
         self.win.handle_KeyPress = self._handle_KeyPress
@@ -135,8 +136,7 @@ class Popup(configurable.Configurable):
 
     def draw_text(self, x=None, y=None):
         self.layout.draw(
-            x or self.horizontal_padding,
-            y or self.vertical_padding,
+            x or self.horizontal_padding, y or self.vertical_padding,
         )
 
     def draw(self):
@@ -144,8 +144,13 @@ class Popup(configurable.Configurable):
 
     def place(self):
         self.win.place(
-            self.x, self.y, self.width, self.height,
-            self.border_width, self.border, above=True
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            self.border_width,
+            self.border,
+            above=True,
         )
 
     def unhide(self):

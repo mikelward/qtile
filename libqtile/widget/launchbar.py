@@ -66,11 +66,15 @@ class LaunchBar(base._Widget):
             ('thunderbird', 'thunderbird -safe-mode', 'launch thunderbird in safe mode')
             ('logout', 'qshell:self.qtile.cmd_shutdown()', 'logout from qtile')
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('padding', 2, 'Padding between icons'),
-        ('default_icon', '/usr/share/icons/oxygen/256x256/mimetypes/'
-         'application-x-executable.png', 'Default icon not found'),
+        (
+            'default_icon',
+            '/usr/share/icons/oxygen/256x256/mimetypes/' 'application-x-executable.png',
+            'Default icon not found',
+        ),
     ]
 
     def __init__(self, progs=None, width=bar.CALCULATED, **config):
@@ -83,9 +87,18 @@ class LaunchBar(base._Widget):
         self.icons_widths = {}
         self.icons_offsets = {}
         # For now, ignore the comments but may be one day it will be useful
-        self.progs = dict(enumerate([{'name': prog[0], 'cmd': prog[1],
-                                      'comment': prog[2] if len(prog) > 2 else
-                                      None} for prog in progs]))
+        self.progs = dict(
+            enumerate(
+                [
+                    {
+                        'name': prog[0],
+                        'cmd': prog[1],
+                        'comment': prog[2] if len(prog) > 2 else None,
+                    }
+                    for prog in progs
+                ]
+            )
+        )
         self.progs_name = set([prog['name'] for prog in self.progs.values()])
         self.length_type = bar.STATIC
         self.length = 0
@@ -102,7 +115,9 @@ class LaunchBar(base._Widget):
             if iconfile is None:
                 logger.warning(
                     'No icon found for application "%s" (%s) switch to text mode',
-                    img_name, iconfile)
+                    img_name,
+                    iconfile,
+                )
                 # if no icon is found and no default icon was set, we just
                 # print the name, based on a textbox.
                 textbox = base._TextBox()
@@ -125,7 +140,11 @@ class LaunchBar(base._Widget):
                 try:
                     img = cairocffi.ImageSurface.create_from_png(iconfile)
                 except cairocffi.Error:
-                    logger.exception('Error loading icon for application "%s" (%s)', img_name, iconfile)
+                    logger.exception(
+                        'Error loading icon for application "%s" (%s)',
+                        img_name,
+                        iconfile,
+                    )
                     return
 
             input_width = img.get_width()
@@ -155,7 +174,9 @@ class LaunchBar(base._Widget):
                 self.icons_files[name] = name if os.path.isfile(name) else None
             else:
                 # try to add the extension
-                self.icons_files[name] = name + '.png' if os.path.isfile(name + '.png') else None
+                self.icons_files[name] = (
+                    name + '.png' if os.path.isfile(name + '.png') else None
+                )
         else:
             self.icons_files[name] = getIconPath(name)
         # no search method found an icon, so default icon
@@ -175,9 +196,11 @@ class LaunchBar(base._Widget):
     def get_icon_in_position(self, x, y):
         """ Determine which icon is clicked according to its position. """
         for i in self.progs:
-            if x < (self.icons_offsets[i] +
-                    self.icons_widths[self.progs[i]['name']] +
-                    self.padding / 2):
+            if x < (
+                self.icons_offsets[i]
+                + self.icons_widths[self.progs[i]['name']]
+                + self.padding / 2
+            ):
                 return i
 
     def button_press(self, x, y, button):
@@ -207,17 +230,19 @@ class LaunchBar(base._Widget):
                 textbox = self.surfaces[name]
                 textbox.layout.draw(
                     self.padding + textbox.actual_padding,
-                    int((self.bar.height - textbox.layout.height) / 2.0) + 1
+                    int((self.bar.height - textbox.layout.height) / 2.0) + 1,
                 )
             else:
                 # display an icon
                 self.drawer.ctx.set_source(self.surfaces[name])
                 self.drawer.ctx.paint()
-            self.drawer.draw(offsetx=self.offset + xoffset,
-                             width=icon_width + self.padding)
+            self.drawer.draw(
+                offsetx=self.offset + xoffset, width=icon_width + self.padding
+            )
             xoffset += icon_width + self.padding
 
     def calculate_length(self):
         """ Compute the width of the widget according to each icon width. """
-        return sum(self.icons_widths[prg['name']] for prg in self.progs.values()) \
-            + self.padding * (len(self.progs) + 1)
+        return sum(
+            self.icons_widths[prg['name']] for prg in self.progs.values()
+        ) + self.padding * (len(self.progs) + 1)

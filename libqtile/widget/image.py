@@ -29,6 +29,7 @@ from libqtile.widget import base
 
 class Image(base._Widget, base.MarginMixin):
     """Display a PNG image on the bar"""
+
     orientations = base.ORIENTATION_BOTH
     defaults = [
         ("scale", True, "Enable/Disable image scaling"),
@@ -40,8 +41,10 @@ class Image(base._Widget, base.MarginMixin):
         # 'width' was replaced by 'length' since the widget can be installed in
         # vertical bars
         if width is not None:
-            logger.warning('width kwarg or positional argument is '
-                           'deprecated. Please use length.')
+            logger.warning(
+                'width kwarg or positional argument is '
+                'deprecated. Please use length.'
+            )
             length = width
 
         base._Widget.__init__(self, length, **config)

@@ -45,14 +45,7 @@ class Max(_SimpleLayoutBase):
 
     def configure(self, client, screen):
         if self.clients and client is self.clients.current_client:
-            client.place(
-                screen.x,
-                screen.y,
-                screen.width,
-                screen.height,
-                0,
-                None
-            )
+            client.place(screen.x, screen.y, screen.width, screen.height, 0, None)
             client.unhide()
         else:
             client.hide()

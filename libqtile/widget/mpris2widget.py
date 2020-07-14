@@ -36,27 +36,37 @@ class Mpris2(base._TextBox):
     audacious.  This widget scrolls the text if neccessary and information that
     is displayed is configurable.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('name', 'audacious', 'Name of the MPRIS widget.'),
-
-        ('objname', 'org.mpris.MediaPlayer2.audacious',
+        (
+            'objname',
+            'org.mpris.MediaPlayer2.audacious',
             'DBUS MPRIS 2 compatible player identifier'
             '- Find it out with dbus-monitor - '
             'Also see: http://specifications.freedesktop.org/'
-            'mpris-spec/latest/#Bus-Name-Policy'),
-
-        ('display_metadata', ['xesam:title', 'xesam:album', 'xesam:artist'],
+            'mpris-spec/latest/#Bus-Name-Policy',
+        ),
+        (
+            'display_metadata',
+            ['xesam:title', 'xesam:album', 'xesam:artist'],
             'Which metadata identifiers to display. '
             'See http://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#index5h3 '
-            'for available values'),
-
+            'for available values',
+        ),
         ('scroll_chars', 30, 'How many chars at once to display.'),
         ('scroll_interval', 0.5, 'Scroll delay interval.'),
-        ('scroll_wait_intervals', 8, 'Wait x scroll_interval before'
-            'scrolling/removing text'),
-
-        ('stop_pause_text', None, "Optional text to display when in the stopped/paused state"),
+        (
+            'scroll_wait_intervals',
+            8,
+            'Wait x scroll_interval before' 'scrolling/removing text',
+        ),
+        (
+            'stop_pause_text',
+            None,
+            "Optional text to display when in the stopped/paused state",
+        ),
     ]
 
     def __init__(self, **config):
@@ -83,9 +93,11 @@ class Mpris2(base._TextBox):
         self.dbus_loop = DBusGMainLoop()
         self.bus = dbus.SessionBus(mainloop=self.dbus_loop)
         self.bus.add_signal_receiver(
-            self.update, 'PropertiesChanged',
-            'org.freedesktop.DBus.Properties', self.objname,
-            '/org/mpris/MediaPlayer2'
+            self.update,
+            'PropertiesChanged',
+            'org.freedesktop.DBus.Properties',
+            self.objname,
+            '/org/mpris/MediaPlayer2',
         )
 
     def update(self, interface_name, changed_properties, invalidated_properties):
@@ -98,12 +110,17 @@ class Mpris2(base._TextBox):
         metadata = changed_properties.get('Metadata')
         if metadata:
             self.is_playing = True
-            self.displaytext = ' - '.join([
-                metadata.get(x)
-                if isinstance(metadata.get(x), dbus.String)
-                else ' + '.join(y for y in metadata.get(x) if isinstance(y, dbus.String))
-                for x in self.display_metadata if metadata.get(x)
-            ])
+            self.displaytext = ' - '.join(
+                [
+                    metadata.get(x)
+                    if isinstance(metadata.get(x), dbus.String)
+                    else ' + '.join(
+                        y for y in metadata.get(x) if isinstance(y, dbus.String)
+                    )
+                    for x in self.display_metadata
+                    if metadata.get(x)
+                ]
+            )
             self.displaytext.replace('\n', '')
 
         playbackstatus = changed_properties.get('PlaybackStatus')
@@ -132,7 +149,7 @@ class Mpris2(base._TextBox):
             self.displaytext = ''
 
         if self.scroll_chars and self.scroll_interval:
-            if(self.scroll_timer):
+            if self.scroll_timer:
                 self.scroll_timer.cancel()
             self.scrolltext = self.displaytext
             self.scroll_counter = self.scroll_wait_intervals
@@ -143,8 +160,8 @@ class Mpris2(base._TextBox):
             self.bar.draw()
 
     def scroll_text(self):
-        if self.text != self.scrolltext[:self.scroll_chars]:
-            self.text = self.scrolltext[:self.scroll_chars]
+        if self.text != self.scrolltext[: self.scroll_chars]:
+            self.text = self.scrolltext[: self.scroll_chars]
             self.bar.draw()
         if self.scroll_counter:
             self.scroll_counter -= 1
@@ -162,7 +179,4 @@ class Mpris2(base._TextBox):
 
     def cmd_info(self):
         """What's the current state of the widget?"""
-        return dict(
-            displaytext=self.displaytext,
-            isplaying=self.is_playing,
-        )
+        return dict(displaytext=self.displaytext, isplaying=self.is_playing,)

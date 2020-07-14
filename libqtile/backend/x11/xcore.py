@@ -419,7 +419,9 @@ class XCore(base.Core):
 
     def ungrab_keys(self) -> None:
         """Ungrab all of the key events"""
-        self.conn.conn.core.UngrabKey(xcffib.xproto.Atom.Any, self._root.wid, xcffib.xproto.ModMask.Any)
+        self.conn.conn.core.UngrabKey(
+            xcffib.xproto.Atom.Any, self._root.wid, xcffib.xproto.ModMask.Any
+        )
 
     def grab_pointer(self) -> None:
         """Get the focus for pointer events"""
@@ -471,7 +473,9 @@ class XCore(base.Core):
 
     def ungrab_buttons(self) -> None:
         """Un-grab all mouse events"""
-        self.conn.conn.core.UngrabButton(xcffib.xproto.Atom.Any, self._root.wid, xcffib.xproto.ModMask.Any)
+        self.conn.conn.core.UngrabButton(
+            xcffib.xproto.Atom.Any, self._root.wid, xcffib.xproto.ModMask.Any
+        )
 
     def _auto_modmasks(self) -> Iterator[int]:
         """The modifier masks to add"""

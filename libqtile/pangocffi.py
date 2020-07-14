@@ -50,7 +50,9 @@
 try:
     from libqtile._ffi_pango import ffi
 except ImportError:
-    raise ImportError("No module named libqtile._ffi_pango, be sure to run `./scripts/ffibuild`")
+    raise ImportError(
+        "No module named libqtile._ffi_pango, be sure to run `./scripts/ffibuild`"
+    )
 
 gobject = ffi.dlopen('libgobject-2.0.so.0')
 pango = ffi.dlopen('libpango-1.0.so.0')
@@ -60,10 +62,12 @@ pangocairo = ffi.dlopen('libpangocairo-1.0.so.0')
 def patch_cairo_context(cairo_t):
     def create_layout():
         return PangoLayout(cairo_t._pointer)
+
     cairo_t.create_layout = create_layout
 
     def show_layout(layout):
         pangocairo.pango_cairo_show_layout(cairo_t._pointer, layout._pointer)
+
     cairo_t.show_layout = show_layout
 
     return cairo_t
@@ -89,6 +93,7 @@ class PangoLayout:
         def free(p):
             p = ffi.cast("gpointer", p)
             gobject.g_object_unref(p)
+
         self._pointer = ffi.gc(self._pointer, free)
 
     def finalize(self):
@@ -174,7 +179,9 @@ def parse_markup(value, accel_marker=0):
     error = ffi.new("GError**")
     value = value.encode()
 
-    ret = pango.pango_parse_markup(value, -1, accel_marker, attr_list, text, ffi.NULL, error)
+    ret = pango.pango_parse_markup(
+        value, -1, accel_marker, attr_list, text, ffi.NULL, error
+    )
 
     if ret == 0:
         raise Exception("parse_markup() failed for %s" % value)

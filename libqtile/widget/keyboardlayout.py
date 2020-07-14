@@ -37,16 +37,29 @@ class KeyboardLayout(base.InLoopPollText):
 
     It requires setxkbmap to be available in the system.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("update_interval", 1, "Update time in seconds."),
-        ("configured_keyboards", ["us"], "A list of predefined keyboard layouts "
+        (
+            "configured_keyboards",
+            ["us"],
+            "A list of predefined keyboard layouts "
             "represented as strings. For example: "
-            "['us', 'us colemak', 'es', 'fr']."),
-        ("display_map", {}, "Custom display of layout. Key should be in format "
+            "['us', 'us colemak', 'es', 'fr'].",
+        ),
+        (
+            "display_map",
+            {},
+            "Custom display of layout. Key should be in format "
             "'layout variant'. For example: "
-            "{'us': 'us ', 'lt sgs': 'sgs', 'ru phonetic': 'ru '}"),
-        ("option", None, "string of setxkbmap option. Ex., 'compose:menu,grp_led:scroll'"),
+            "{'us': 'us ', 'lt sgs': 'sgs', 'ru phonetic': 'ru '}",
+        ),
+        (
+            "option",
+            None,
+            "string of setxkbmap option. Ex., 'compose:menu,grp_led:scroll'",
+        ),
     ]
 
     def __init__(self, **config):
@@ -69,8 +82,9 @@ class KeyboardLayout(base.InLoopPollText):
         if current_keyboard in self.configured_keyboards:
             # iterate the list circularly
             next_keyboard = self.configured_keyboards[
-                (self.configured_keyboards.index(current_keyboard) + 1) %
-                len(self.configured_keyboards)]
+                (self.configured_keyboards.index(current_keyboard) + 1)
+                % len(self.configured_keyboards)
+            ]
         else:
             next_keyboard = self.configured_keyboards[0]
 

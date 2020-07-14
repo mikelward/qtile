@@ -34,6 +34,7 @@ def ensure_connected(f):
 
     It *should* be successful if the player is alive
     """
+
     def wrapper(self, *args, **kwargs):
         try:
             self.iface.GetMetadata()
@@ -43,6 +44,7 @@ def ensure_connected(f):
             # _connect()ed yet
             self._connect()
         return f(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -53,12 +55,17 @@ class Mpris(base._TextBox):
     player. It should work with all players which implement a reasonably
     correct version of MPRIS, though I have only tested it with clementine.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
 
     defaults = [
         ('name', 'clementine', 'Name of the widget'),
         ('objname', 'org.mpris.clementine', 'DBUS object to connect to'),
-        ('stop_pause_text', 'Stopped', "Optional text to display when in the stopped/paused state"),
+        (
+            'stop_pause_text',
+            'Stopped',
+            "Optional text to display when in the stopped/paused state",
+        ),
     ]
 
     def __init__(self, **config):
@@ -81,14 +88,8 @@ class Mpris(base._TextBox):
         self.bus = dbus.SessionBus(mainloop=self.dbus_loop)
 
         # watch for our player to start up
-        deebus = self.bus.get_object(
-            'org.freedesktop.DBus',
-            '/org/freedesktop/DBus'
-        )
-        deebus.connect_to_signal(
-            "NameOwnerChanged",
-            self.handle_name_owner_change
-        )
+        deebus = self.bus.get_object('org.freedesktop.DBus', '/org/freedesktop/DBus')
+        deebus.connect_to_signal("NameOwnerChanged", self.handle_name_owner_change)
 
         # try to connect for grins
         self._connect()
@@ -98,19 +99,12 @@ class Mpris(base._TextBox):
         try:
             self.player = self.bus.get_object(self.objname, '/Player')
             self.iface = dbus.Interface(
-                self.player,
-                dbus_interface='org.freedesktop.MediaPlayer'
+                self.player, dbus_interface='org.freedesktop.MediaPlayer'
             )
             # See: http://xmms2.org/wiki/MPRIS for info on signals
             # and what they mean.
-            self.iface.connect_to_signal(
-                "TrackChange",
-                self.handle_track_change
-            )
-            self.iface.connect_to_signal(
-                "StatusChange",
-                self.handle_status_change
-            )
+            self.iface.connect_to_signal("TrackChange", self.handle_track_change)
+            self.iface.connect_to_signal("StatusChange", self.handle_status_change)
             self.connected = True
         except dbus.exceptions.DBusException:
             logger.exception("exception initializing mpris")
@@ -174,9 +168,7 @@ class Mpris(base._TextBox):
     def cmd_info(self):
         """What's the current state of the widget?"""
         return dict(
-            connected=self.connected,
-            nowplaying=self.text,
-            isplaying=self.is_playing(),
+            connected=self.connected, nowplaying=self.text, isplaying=self.is_playing(),
         )
 
     def cmd_update(self):

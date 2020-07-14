@@ -29,16 +29,19 @@ from libqtile.command_object import CommandObject
 
 class Layout(CommandObject, configurable.Configurable, metaclass=ABCMeta):
     """This class defines the API that should be exposed by all layouts"""
+
     @classmethod
     def _name(cls):
         return cls.__class__.__name__.lower()
 
-    defaults = [(
-        "name",
-        None,
-        "The name of this layout"
-        " (usually the class' name in lowercase, e.g. 'max')"
-    )]  # type: List[Tuple[str, Any, str]]
+    defaults = [
+        (
+            "name",
+            None,
+            "The name of this layout"
+            " (usually the class' name in lowercase, e.g. 'max')",
+        )
+    ]  # type: List[Tuple[str, Any, str]]
 
     def __init__(self, **config):
         # name is a little odd; we can't resolve it until the class is defined
@@ -104,10 +107,7 @@ class Layout(CommandObject, configurable.Configurable, metaclass=ABCMeta):
 
     def info(self):
         """Returns a dictionary of layout information"""
-        return dict(
-            name=self.name,
-            group=self.group.name if self.group else None
-        )
+        return dict(name=self.name, group=self.group.name if self.group else None)
 
     def cmd_info(self):
         """Return a dictionary of info for this object"""
@@ -230,10 +230,7 @@ class SingleWindow(Layout):
     def configure(self, win, screen):
         if win is self._get_window():
             win.place(
-                screen.x, screen.y,
-                screen.width, screen.height,
-                0,
-                None,
+                screen.x, screen.y, screen.width, screen.height, 0, None,
             )
             win.unhide()
         else:
@@ -270,7 +267,7 @@ class Delegate(Layout):
     def delegate_layout(self, windows, mapping):
         """Delegates layouting actual windows
 
-        Parameterer
+        Parameters
         ===========
         windows:
             windows to layout
@@ -297,6 +294,22 @@ class Delegate(Layout):
                 idx += 1
                 focus = layouts[idx].focus_first()
         return focus
+
+    @abstractmethod
+    def show(self, screen):
+        """Tells the layout to show itself on the given ScreenRect"""
+        pass
+
+    def hide(self):
+        for lay in self._get_layouts():
+            lay.hide()
+
+    def focus(self, win):
+        self.layouts[win].focus(win)
+
+    def blur(self):
+        for lay in self._get_layouts():
+            lay.blur()
 
     def focus_first(self):
         layouts = self._get_layouts()
@@ -543,8 +556,7 @@ class _ClientList:
         """
         pos = max(0, self.current_index + offset_to_current)
         if pos < len(self.clients):
-            self.clients = (self.clients[:pos:] + other.clients +
-                            self.clients[pos::])
+            self.clients = self.clients[:pos:] + other.clients + self.clients[pos::]
         else:
             self.clients.extend(other.clients)
 
@@ -572,13 +584,11 @@ class _ClientList:
     def __str__(self):
         curr = self.current_client
         return "_WindowCollection: " + ", ".join(
-            [('[%s]' if c == curr else '%s') % c.name for c in self.clients])
+            [('[%s]' if c == curr else '%s') % c.name for c in self.clients]
+        )
 
     def info(self):
-        return dict(
-            clients=[c.name for c in self.clients],
-            current=self._current_idx,
-        )
+        return dict(clients=[c.name for c in self.clients], current=self._current_idx,)
 
 
 class _SimpleLayoutBase(Layout):

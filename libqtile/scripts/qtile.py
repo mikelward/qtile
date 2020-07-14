@@ -37,6 +37,7 @@ except locale.Error:
 
 try:
     import pkg_resources
+
     VERSION = pkg_resources.require("qtile")[0].version
 except (pkg_resources.DistributionNotFound, ImportError):
     VERSION = 'dev'
@@ -53,6 +54,7 @@ def rename_process():
     """
     try:
         import setproctitle
+
         setproctitle.setproctitle("qtile")
     except ImportError:
         pass
@@ -60,43 +62,46 @@ def rename_process():
 
 def make_qtile():
     from argparse import ArgumentParser
+
     parser = ArgumentParser(
-        description='A full-featured, pure-Python tiling window manager.',
-        prog='qtile',
+        description='A full-featured, pure-Python tiling window manager.', prog='qtile',
     )
     parser.add_argument(
-        '--version',
-        action='version',
-        version=VERSION,
+        '--version', action='version', version=VERSION,
     )
     parser.add_argument(
-        "-c", "--config",
+        "-c",
+        "--config",
         action="store",
-        default=path.expanduser(path.join(
-            getenv('XDG_CONFIG_HOME', '~/.config'), 'qtile', 'config.py')),
+        default=path.expanduser(
+            path.join(getenv('XDG_CONFIG_HOME', '~/.config'), 'qtile', 'config.py')
+        ),
         dest="configfile",
         help='Use the specified configuration file',
     )
     parser.add_argument(
-        "-s", "--socket",
+        "-s",
+        "--socket",
         action="store",
         default=None,
         dest="socket",
-        help='Path of the Qtile IPC socket.'
+        help='Path of the Qtile IPC socket.',
     )
     parser.add_argument(
-        "-n", "--no-spawn",
+        "-n",
+        "--no-spawn",
         action="store_true",
         default=False,
         dest="no_spawn",
-        help='Avoid spawning apps. (Used for restart)'
+        help='Avoid spawning apps. (Used for restart)',
     )
     parser.add_argument(
-        '-l', '--log-level',
+        '-l',
+        '--log-level',
         default='WARNING',
         dest='log_level',
         choices=('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'),
-        help='Set qtile log level'
+        help='Set qtile log level',
     )
     parser.add_argument(
         '--with-state',
@@ -114,27 +119,32 @@ def make_qtile():
             try:
                 makedirs(path.dirname(options.configfile), exist_ok=True)
                 from shutil import copyfile
-                default_config_path = path.join(path.dirname(__file__),
-                                                "..",
-                                                "resources",
-                                                "default_config.py")
+
+                default_config_path = path.join(
+                    path.dirname(__file__), "..", "resources", "default_config.py"
+                )
                 copyfile(default_config_path, options.configfile)
                 logger.info('Copied default_config.py to %s', options.configfile)
             except Exception as e:
-                logger.exception('Failed to copy default_config.py to %s: (%s)',
-                                 options.configfile, e)
+                logger.exception(
+                    'Failed to copy default_config.py to %s: (%s)',
+                    options.configfile,
+                    e,
+                )
 
         config = confreader.Config.from_file(options.configfile, kore=kore)
     except Exception as e:
         logger.exception('Error while reading config file (%s)', e)
         config = confreader.Config()
         from libqtile.widget import TextBox
+
         widgets = config.screens[0].bottom.widgets
         widgets.insert(0, TextBox('Config Err!'))
 
     # XXX: the import is here because we need to call init_log
     # before start importing stuff
     from libqtile.core import session_manager
+
     return session_manager.SessionManager(
         kore,
         config,

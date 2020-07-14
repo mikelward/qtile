@@ -43,10 +43,9 @@ class Spacer(base._Widget):
     width :
         DEPRECATED, same as ``length``.
     """
+
     orientations = base.ORIENTATION_BOTH
-    defaults = [
-        ("background", None, "Widget background color")
-    ]
+    defaults = [("background", None, "Widget background color")]
 
     def __init__(self, length=bar.STRETCH, width=None, **config):
         """
@@ -54,8 +53,10 @@ class Spacer(base._Widget):
         # 'width' was replaced by 'length' since the widget can be installed in
         # vertical bars
         if width is not None:
-            logger.warning('width kwarg or positional argument is '
-                           'deprecated. Please use length.')
+            logger.warning(
+                'width kwarg or positional argument is '
+                'deprecated. Please use length.'
+            )
             length = width
 
         base._Widget.__init__(self, length, **config)

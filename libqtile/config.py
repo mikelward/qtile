@@ -52,6 +52,7 @@ class Key:
     desc:
         description to be added to the key binding
     """
+
     def __init__(self, modifiers: List[str], key: str, *commands, desc: str = ""):
         self.modifiers = modifiers
         self.key = key
@@ -78,12 +79,16 @@ class KeyChord:
         A string with vim like mode name if it's set chord not end
         after use one of submapings or Esc key
     """
-    def __init__(self, modifiers: List[str], key: str, submapings: List[Key], mode: str = ""):
+
+    def __init__(
+        self, modifiers: List[str], key: str, submapings: List[Key], mode: str = ""
+    ):
         self.modifiers = modifiers
         self.key = key
 
         def noop(qtile):
             pass
+
         submapings.append(Key([], "Escape", lazy.function(noop)))
         self.submapings = submapings
         self.mode = mode
@@ -112,6 +117,7 @@ class Drag(Mouse):
     It focuses clicked window by default.  If you want to prevent it pass,
     `focus=None` as an argument
     """
+
     def __init__(self, *args, start=False, **kwargs):
         super().__init__(*args, **kwargs)
         self.start = start
@@ -126,6 +132,7 @@ class Click(Mouse):
     It focuses clicked window by default.  If you want to prevent it, pass
     `focus=None` as an argument
     """
+
     def __repr__(self):
         return "<Click (%s, %s)>" % (self.modifiers, self.button)
 
@@ -201,7 +208,6 @@ class EzDrag(EzConfig, Drag):
 
 
 class ScreenRect:
-
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
@@ -211,8 +217,10 @@ class ScreenRect:
     def __repr__(self):
         return '<%s %d,%d %d,%d>' % (
             self.__class__.__name__,
-            self.x, self.y,
-            self.width, self.height
+            self.x,
+            self.y,
+            self.width,
+            self.height,
         )
 
     def hsplit(self, columnwidth):
@@ -221,9 +229,8 @@ class ScreenRect:
         return (
             self.__class__(self.x, self.y, columnwidth, self.height),
             self.__class__(
-                self.x + columnwidth, self.y,
-                self.width - columnwidth, self.height
-            )
+                self.x + columnwidth, self.y, self.width - columnwidth, self.height
+            ),
         )
 
     def vsplit(self, rowheight):
@@ -232,9 +239,8 @@ class ScreenRect:
         return (
             self.__class__(self.x, self.y, self.width, rowheight),
             self.__class__(
-                self.x, self.y + rowheight,
-                self.width, self.height - rowheight
-            )
+                self.x, self.y + rowheight, self.width, self.height - rowheight
+            ),
         )
 
 
@@ -254,11 +260,20 @@ class Screen(CommandObject):
     resized to fill it. If the mode is 'stretch', the image is stretched to fit all of
     it into the screen.
     """
-    def __init__(self, top: Optional[BarType] = None, bottom: Optional[BarType] = None,
-                 left: Optional[BarType] = None, right: Optional[BarType] = None,
-                 wallpaper: Optional[str] = None, wallpaper_mode: Optional[str] = None,
-                 x: Optional[int] = None, y: Optional[int] = None, width: Optional[int] = None,
-                 height: Optional[int] = None):
+
+    def __init__(
+        self,
+        top: Optional[BarType] = None,
+        bottom: Optional[BarType] = None,
+        left: Optional[BarType] = None,
+        right: Optional[BarType] = None,
+        wallpaper: Optional[str] = None,
+        wallpaper_mode: Optional[str] = None,
+        x: Optional[int] = None,
+        y: Optional[int] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+    ):
         self.group = None
         self.previous_group = None
 
@@ -366,9 +381,7 @@ class Screen(CommandObject):
         hook.fire("setgroup")
         hook.fire("focus_change")
         hook.fire(
-            "layout_change",
-            self.group.layouts[self.group.current_layout],
-            self.group
+            "layout_change", self.group.layouts[self.group.current_layout], self.group
         )
 
     def toggle_group(self, group=None):
@@ -419,11 +432,7 @@ class Screen(CommandObject):
     def cmd_info(self):
         """Returns a dictionary of info for this screen."""
         return dict(
-            index=self.index,
-            width=self.width,
-            height=self.height,
-            x=self.x,
-            y=self.y
+            index=self.index, width=self.width, height=self.height, x=self.x, y=self.y
         )
 
     def cmd_resize(self, x=None, y=None, w=None, h=None):
@@ -491,10 +500,22 @@ class Group:
         Use this to define a display name other than name of the group.
         If set to None, the display name is set to the name.
     """
-    def __init__(self, name, matches=None, exclusive=False,
-                 spawn=None, layout=None, layouts=None, persist=True, init=True,
-                 layout_opts=None, screen_affinity=None, position=sys.maxsize,
-                 label=None):
+
+    def __init__(
+        self,
+        name,
+        matches=None,
+        exclusive=False,
+        spawn=None,
+        layout=None,
+        layouts=None,
+        persist=True,
+        init=True,
+        layout_opts=None,
+        screen_affinity=None,
+        position=sys.maxsize,
+        label=None,
+    ):
         self.name = name
         self.label = label
         self.exclusive = exclusive
@@ -512,8 +533,18 @@ class Group:
     def __repr__(self):
         attrs = utils.describe_attributes(
             self,
-            ['exclusive', 'spawn', 'layout', 'layouts', 'persist', 'init',
-             'matches', 'layout_opts', 'screen_affinity'])
+            [
+                'exclusive',
+                'spawn',
+                'layout',
+                'layouts',
+                'persist',
+                'init',
+                'matches',
+                'layout_opts',
+                'screen_affinity',
+            ],
+        )
         return '<config.Group %r (%s)>' % (self.name, attrs)
 
 
@@ -536,14 +567,24 @@ class ScratchPad(Group):
         The display name of the ScratchPad group. Defaults to the empty string
         such that the group is hidden in ``GroupList`` widget.
     """
+
     def __init__(self, name, dropdowns=None, position=sys.maxsize, label=''):
-        Group.__init__(self, name, layout='floating', layouts=['floating'],
-                       init=False, position=position, label=label)
+        Group.__init__(
+            self,
+            name,
+            layout='floating',
+            layouts=['floating'],
+            init=False,
+            position=position,
+            label=label,
+        )
         self.dropdowns = dropdowns if dropdowns is not None else []
 
     def __repr__(self):
         return '<config.ScratchPad %r (%s)>' % (
-            self.name, ', '.join(dd.name for dd in self.dropdowns))
+            self.name,
+            ', '.join(dd.name for dd in self.dropdowns),
+        )
 
 
 class Match:
@@ -571,8 +612,16 @@ class Match:
         things to match against the _NET_WM_PID atom (only int allowed in this
         rule)
     """
-    def __init__(self, title=None, wm_class=None, role=None, wm_type=None,
-                 wm_instance_class=None, net_wm_pid=None):
+
+    def __init__(
+        self,
+        title=None,
+        wm_class=None,
+        role=None,
+        wm_type=None,
+        wm_instance_class=None,
+        net_wm_pid=None,
+    ):
         if not title:
             title = []
         if not wm_class:
@@ -589,8 +638,9 @@ class Match:
         try:
             net_wm_pid = list(map(int, net_wm_pid))
         except ValueError:
-            error = 'Invalid rule for net_wm_pid: "%s" '\
-                    'only ints allowed' % str(net_wm_pid)
+            error = 'Invalid rule for net_wm_pid: "%s" ' 'only ints allowed' % str(
+                net_wm_pid
+            )
             raise utils.QtileError(error)
 
         self._rules = [('title', t) for t in title]
@@ -603,11 +653,12 @@ class Match:
     def compare(self, client):
         for _type, rule in self._rules:
             if _type == "net_wm_pid":
+
                 def match_func(value):
                     return rule == value
+
             else:
-                match_func = getattr(rule, 'match', None) or \
-                    getattr(rule, 'count')
+                match_func = getattr(rule, 'match', None) or getattr(rule, 'count')
 
             if _type == 'title':
                 value = client.name
@@ -658,8 +709,10 @@ class Rule:
     break_on_match :
         Should we stop applying rules if this rule is matched?
     """
-    def __init__(self, match, group=None, float=False, intrusive=False,
-                 break_on_match=True):
+
+    def __init__(
+        self, match, group=None, float=False, intrusive=False, break_on_match=True
+    ):
         self.match = match
         self.group = group
         self.float = float
@@ -670,7 +723,9 @@ class Rule:
         return self.match.compare(w)
 
     def __repr__(self):
-        actions = utils.describe_attributes(self, ['group', 'float', 'intrusive', 'break_on_match'])
+        actions = utils.describe_attributes(
+            self, ['group', 'float', 'intrusive', 'break_on_match']
+        )
         return '<Rule match=%r actions=(%s)>' % (self.match, actions)
 
 
@@ -680,47 +735,36 @@ class DropDown(configurable.Configurable):
     That window can be shown and hidden using a configurable keystroke
     or any other scripted trigger.
     """
+
     defaults = (
         (
             'x',
             0.1,
             'X position of window as fraction of current screen width. '
-            '0 is the left most position.'
+            '0 is the left most position.',
         ),
         (
             'y',
             0.0,
             'Y position of window as fraction of current screen height. '
             '0 is the top most position. To show the window at bottom, '
-            'you have to configure a value < 1 and an appropriate height.'
+            'you have to configure a value < 1 and an appropriate height.',
         ),
-        (
-            'width',
-            0.8,
-            'Width of window as fraction of current screen width'
-        ),
-        (
-            'height',
-            0.35,
-            'Height of window as fraction of current screen.'
-        ),
-        (
-            'opacity',
-            0.9,
-            'Opacity of window as fraction. Zero is opaque.'
-        ),
+        ('width', 0.8, 'Width of window as fraction of current screen width'),
+        ('height', 0.35, 'Height of window as fraction of current screen.'),
+        ('opacity', 0.9, 'Opacity of window as fraction. Zero is opaque.'),
         (
             'on_focus_lost_hide',
             True,
             'Shall the window be hidden if focus is lost? If so, the DropDown '
-            'is hidden if window focus or the group is changed.'
+            'is hidden if window focus or the group is changed.',
         ),
         (
             'warp_pointer',
             True,
             'Shall pointer warp to center of window on activation? '
             'This has only effect if any of the on_focus_lost_xxx '
-            'configurations is True'
+            'configurations is True',
         ),
     )
 
@@ -743,12 +787,14 @@ class DropDown(configurable.Configurable):
         self.add_defaults(self.defaults)
 
     def info(self):
-        return dict(name=self.name,
-                    command=self.command,
-                    x=self.x,
-                    y=self.y,
-                    width=self.width,
-                    height=self.height,
-                    opacity=self.opacity,
-                    on_focus_lost_hide=self.on_focus_lost_hide,
-                    warp_pointer=self.warp_pointer,)
+        return dict(
+            name=self.name,
+            command=self.command,
+            x=self.x,
+            y=self.y,
+            width=self.width,
+            height=self.height,
+            opacity=self.opacity,
+            on_focus_lost_hide=self.on_focus_lost_hide,
+            warp_pointer=self.warp_pointer,
+        )

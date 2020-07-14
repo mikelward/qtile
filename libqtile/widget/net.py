@@ -35,12 +35,20 @@ class Net(base.ThreadedPollText):
 
     .. _psutil: https://pypi.org/project/psutil/
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
-        ('format', '{interface}: {down} \u2193\u2191 {up}',
-         'Display format of down-/upload speed of given interfaces'),
-        ('interface', None, 'List of interfaces or single NIC as string to monitor, \
-            None to displays all active NICs combined'),
+        (
+            'format',
+            '{interface}: {down} \u2193\u2191 {up}',
+            'Display format of down-/upload speed of given interfaces',
+        ),
+        (
+            'interface',
+            None,
+            'List of interfaces or single NIC as string to monitor, \
+            None to displays all active NICs combined',
+        ),
         ('update_interval', 1, 'The update interval.'),
         ('use_bits', False, 'Use bits instead of bytes per second?'),
     ]
@@ -54,7 +62,10 @@ class Net(base.ThreadedPollText):
             elif isinstance(self.interface, str):
                 self.interface = [self.interface]
             else:
-                raise AttributeError("Invalid Argument passed: %s\nAllowed Types: List, String, None" % self.interface)
+                raise AttributeError(
+                    "Invalid Argument passed: %s\nAllowed Types: List, String, None"
+                    % self.interface
+                )
         self.stats = self.get_stats()
 
     def convert_b(self, num_bytes: float) -> Tuple[float, str]:
@@ -73,7 +84,7 @@ class Net(base.ThreadedPollText):
         else:
             power = 0
 
-        converted_bytes = num_bytes / factor**power
+        converted_bytes = num_bytes / factor ** power
         unit = letters[power]
 
         return converted_bytes, unit
@@ -104,10 +115,8 @@ class Net(base.ThreadedPollText):
         try:
             for intf in self.interface:
                 new_stats = self.get_stats()
-                down = new_stats[intf]['down'] - \
-                    self.stats[intf]['down']
-                up = new_stats[intf]['up'] - \
-                    self.stats[intf]['up']
+                down = new_stats[intf]['down'] - self.stats[intf]['down']
+                up = new_stats[intf]['up'] - self.stats[intf]['up']
 
                 down = down / self.update_interval
                 up = up / self.update_interval
@@ -120,10 +129,11 @@ class Net(base.ThreadedPollText):
                         **{
                             'interface': intf,
                             'down': down + down_letter,
-                            'up': up + up_letter
-                        }))
+                            'up': up + up_letter,
+                        }
+                    )
+                )
 
             return " ".join(ret_stat)
         except Exception as excp:
-            logger.error('%s: Caught Exception:\n%s',
-                         self.__class__.__name__, excp)
+            logger.error('%s: Caught Exception:\n%s', self.__class__.__name__, excp)

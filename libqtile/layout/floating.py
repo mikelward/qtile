@@ -30,13 +30,9 @@
 
 from libqtile.layout.base import Layout
 
-DEFAULT_FLOAT_WM_TYPES = set([
-    'utility',
-    'notification',
-    'toolbar',
-    'splash',
-    'dialog',
-])
+DEFAULT_FLOAT_WM_TYPES = set(
+    ['utility', 'notification', 'toolbar', 'splash', 'dialog',]
+)
 
 DEFAULT_FLOAT_RULES = [
     {"role": "About"},
@@ -48,6 +44,7 @@ class Floating(Layout):
     """
     Floating layout, which does nothing with windows but handles focus order
     """
+
     defaults = [
         ("border_focus", "#0000ff", "Border colour for the focused window."),
         ("border_normal", "#000000", "Border colour for un-focused windows."),
@@ -58,7 +55,7 @@ class Floating(Layout):
         (
             "auto_float_types",
             DEFAULT_FLOAT_WM_TYPES,
-            "default wm types to automatically float"
+            "default wm types to automatically float",
         ),
     ]
 
@@ -237,7 +234,9 @@ class Floating(Layout):
 
         # ok, it's not java and the window itself didn't position it, but users
         # may still have asked us not to mess with it
-        if self.no_reposition_match is not None and self.no_reposition_match.compare(client):
+        if self.no_reposition_match is not None and self.no_reposition_match.compare(
+            client
+        ):
             client.user_placed_window_setup(bc, bw)
             return
 
@@ -252,13 +251,7 @@ class Floating(Layout):
             above = self.compute_client_position(client, screen)
 
         client.place(
-            client.x,
-            client.y,
-            client.width,
-            client.height,
-            bw,
-            bc,
-            above,
+            client.x, client.y, client.width, client.height, bw, bc, above,
         )
         client.unhide()
 

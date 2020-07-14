@@ -54,7 +54,7 @@ class StockTicker(GenPollUrl):
         self.query = {
             "interval": self.interval,
             "outputsize": "compact",
-            "function": self.function
+            "function": self.function,
         }
         for k, v in config.items():
             self.query[k] = v
@@ -87,4 +87,6 @@ class StockTicker(GenPollUrl):
                 price = "{:0.2f}".format(float(v))
                 break
 
-        return "{symbol}: {sign}{price}".format(symbol=self.symbol, sign=self.sign, price=price)
+        return "{symbol}: {sign}{price}".format(
+            symbol=self.symbol, sign=self.sign, price=price
+        )

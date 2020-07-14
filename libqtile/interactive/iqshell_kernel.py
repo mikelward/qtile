@@ -38,7 +38,9 @@ class QshKernel(Kernel):
         cmd_object = command_interface.IPCCommandInterface(ipc_client)
         self.qsh = sh.QSh(cmd_object)
 
-    def do_execute(self, code, silent, store_history=True, user_expressions=None, allow_stdin=False):
+    def do_execute(
+        self, code, silent, store_history=True, user_expressions=None, allow_stdin=False
+    ):
         # if no command sent, just return
         if not code.strip():
             return {
@@ -101,6 +103,7 @@ class QshKernel(Kernel):
 
 def main():
     from ipykernel.kernelapp import IPKernelApp
+
     IPKernelApp.launch_instance(kernel_class=QshKernel)
 
 

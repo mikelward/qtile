@@ -30,7 +30,11 @@ class QuickExit(base._TextBox):
 
     defaults = [
         ('default_text', '[ shutdown ]', 'A text displayed as a button'),
-        ('countdown_format', '[ {} seconds ]', 'This text is showed when counting down.'),
+        (
+            'countdown_format',
+            '[ {} seconds ]',
+            'This text is showed when counting down.',
+        ),
         ('timer_interval', 1, 'A countdown interval.'),
         ('countdown_start', 5, 'Time to accept the second pushing.'),
     ]

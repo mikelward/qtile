@@ -10,6 +10,8 @@ try:
 
     def xmlparse(body):
         return xmltodict.parse(body)
+
+
 except ImportError:
     # TODO: we could implement a similar parser by hand, but i'm lazy, so let's
     # punt for now
@@ -19,6 +21,7 @@ except ImportError:
 
 class GenPollText(base.ThreadedPollText):
     """A generic text widget that polls using poll function to get the text"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('func', None, 'Poll Function'),
@@ -36,6 +39,7 @@ class GenPollText(base.ThreadedPollText):
 
 class GenPollUrl(base.ThreadedPollText):
     """A generic text widget that polls an url and parses it using parse function"""
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('url', None, 'Url'),

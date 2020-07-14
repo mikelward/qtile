@@ -100,6 +100,7 @@ class Config:
         except Exception:
             import traceback
             from libqtile.log_utils import logger
+
             logger.exception('Could not import config file %r', self.file_path)
             tb = traceback.format_exc()
             raise ConfigError(tb)

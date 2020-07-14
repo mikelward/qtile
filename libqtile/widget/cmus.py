@@ -31,12 +31,13 @@ class Cmus(base.ThreadPoolText):
 
     Cmus (https://cmus.github.io) should be installed.
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('play_color', '00ff00', 'Text colour when playing.'),
         ('noplay_color', 'cecece', 'Text colour when not playing.'),
         ('max_chars', 0, 'Maximum number of characters to display in widget.'),
-        ('update_interval', 0.5, 'Update Time in seconds.')
+        ('update_interval', 0.5, 'Update Time in seconds.'),
     ]
 
     def __init__(self, **config):
@@ -53,19 +54,21 @@ class Cmus(base.ThreadPoolText):
             output = err.output.decode()
         if output.startswith("status"):
             output = output.splitlines()
-            info = {'status': "",
-                    'file': "",
-                    'artist': "",
-                    'album': "",
-                    'title': "",
-                    'stream': ""}
+            info = {
+                'status': "",
+                'file': "",
+                'artist': "",
+                'album': "",
+                'title': "",
+                'stream': "",
+            }
 
             for line in output:
                 for data in info:
                     if data in line:
                         index = line.index(data)
                         if index < 5:
-                            info[data] = line[len(data) + index:].strip()
+                            info[data] = line[len(data) + index :].strip()
                             break
                     elif line.startswith("set"):
                         return info
@@ -103,7 +106,7 @@ class Cmus(base.ThreadPoolText):
         if not self.status:
             return
         if len(text) > self.max_chars > 0:
-            text = text[:self.max_chars] + "…"
+            text = text[: self.max_chars] + "…"
         self.text = text
 
         if self.layout.width == old_width:

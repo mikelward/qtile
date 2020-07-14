@@ -28,11 +28,7 @@ class CPU(base.ThreadedPollText):
 
     defaults = [
         ("update_interval", 1.0, "Update interval for the CPU widget"),
-        (
-            "format",
-            "CPU {freq_current}GHz {load_percent}%",
-            "CPU display format",
-        ),
+        ("format", "CPU {freq_current}GHz {load_percent}%", "CPU display format",),
     ]
 
     def __init__(self, **config):

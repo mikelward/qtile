@@ -26,35 +26,40 @@ def main() -> None:
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--version',
-        action='version',
-        version='%(prog)s 0.3',
+        '--version', action='version', version='%(prog)s 0.3',
     )
     parser.add_argument(
-        "-s", "--socket",
-        action="store", type=str,
+        "-s",
+        "--socket",
+        action="store",
+        type=str,
         default=None,
-        help='Use specified socket to connect to qtile.'
+        help='Use specified socket to connect to qtile.',
     )
     parser.add_argument(
-        "-r", "--run",
-        action="store", type=str,
+        "-r",
+        "--run",
+        action="store",
+        type=str,
         default=None,
         dest="pyfile",
-        help='The full path to python file with the \"main\" function to call.'
+        help='The full path to python file with the \"main\" function to call.',
     )
     parser.add_argument(
-        "-c", "--command",
-        action="store", type=str,
+        "-c",
+        "--command",
+        action="store",
+        type=str,
         default=None,
-        help='Run the specified qshell command and exit.'
+        help='Run the specified qshell command and exit.',
     )
     parser.add_argument(
-        "-j", "--json",
+        "-j",
+        "--json",
         action="store_true",
         default=False,
         dest="is_json",
-        help='Use json in order to communicate with qtile server.'
+        help='Use json in order to communicate with qtile server.',
     )
 
     args = parser.parse_args()

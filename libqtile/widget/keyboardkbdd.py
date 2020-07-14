@@ -34,16 +34,22 @@ class KeyboardKbdd(base.ThreadedPollText):
     kbdd should be installed and running, you can get it from:
     https://github.com/qnikst/kbdd
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ("update_interval", 1, "Update interval in seconds."),
-        ("configured_keyboards", ["us", "ir"],
-         "your predefined list of keyboard layouts."
-         "example: ['us', 'ir', 'es']"),
-        ("colours", None,
-         "foreground colour for each layout"
-         "either 'None' or a list of colours."
-         "example: ['ffffff', 'E6F0AF']. ")
+        (
+            "configured_keyboards",
+            ["us", "ir"],
+            "your predefined list of keyboard layouts." "example: ['us', 'ir', 'es']",
+        ),
+        (
+            "colours",
+            None,
+            "foreground colour for each layout"
+            "either 'None' or a list of colours."
+            "example: ['ffffff', 'E6F0AF']. ",
+        ),
     ]
 
     def __init__(self, **config):
@@ -66,9 +72,11 @@ class KeyboardKbdd(base.ThreadedPollText):
     def _dbus_init(self):
         dbus_loop = DBusGMainLoop()
         bus = dbus.SessionBus(mainloop=dbus_loop)
-        bus.add_signal_receiver(self._layout_changed,
-                                dbus_interface='ru.gentoo.kbdd',
-                                signal_name='layoutChanged')
+        bus.add_signal_receiver(
+            self._layout_changed,
+            dbus_interface='ru.gentoo.kbdd',
+            signal_name='layoutChanged',
+        )
 
     def _layout_changed(self, layout_changed):
         """
@@ -85,8 +93,10 @@ class KeyboardKbdd(base.ThreadedPollText):
             except ValueError:
                 self._setColour(index - 1)
         else:
-            logger.error('variable "colours" should be a list, to set a\
-                            colour for all layouts, use "foreground".')
+            logger.error(
+                'variable "colours" should be a list, to set a\
+                            colour for all layouts, use "foreground".'
+            )
 
     def poll(self):
         if not self.is_kbdd_running:

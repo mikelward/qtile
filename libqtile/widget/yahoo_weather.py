@@ -36,8 +36,10 @@ from libqtile.widget.generic_poll_text import GenPollUrl
 # See documentation: https://developer.yahoo.com/weather/documentation.html
 QUERY_URL = 'https://weather-ydn-yql.media.yahoo.com/forecastrss?'
 APP_ID = 'xSqyTW54'
-CONSUMER_KEY = ('dj0yJmk9R0RwZ3dveWEwTHdWJmQ9WVdrOWVGTnhlVlJYTlRRb'
-                'WNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTVi')
+CONSUMER_KEY = (
+    'dj0yJmk9R0RwZ3dveWEwTHdWJmQ9WVdrOWVGTnhlVlJYTlRRb'
+    'WNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTVi'
+)
 CONSUMER_SECRET = '83ea8fbd202ea06cd57fc01268139601bf966b47'
 HEADER = {'X-Yahoo-App-Id': APP_ID}
 
@@ -128,28 +130,21 @@ class YahooWeather(GenPollUrl):
         - forecasts_9_text
         - forecasts_9_code
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         # One of (woeid, location, coordinates) must be set.
-        (
-            'woeid',
-            None,
-            'Where On Earth ID. Precedence over location and coordinates.'
-        ),
+        ('woeid', None, 'Where On Earth ID. Precedence over location and coordinates.'),
         (
             'location',
             None,
-            'Location to fetch weather for. Precedence over coordinates.'
+            'Location to fetch weather for. Precedence over coordinates.',
         ),
-        (
-            'coordinates',
-            None,
-            'Dictionary containing "latitude" and "longitude".'
-        ),
+        ('coordinates', None, 'Dictionary containing "latitude" and "longitude".'),
         (
             'format',
             '{location_city}: {condition_temp} °{units_temperature}',
-            'Display format'
+            'Display format',
         ),
         ('metric', True, 'True to use metric/C, False to use imperial/F'),
         ('up', '^', 'symbol for rising atmospheric pressure'),
@@ -167,10 +162,7 @@ class YahooWeather(GenPollUrl):
         if not self.woeid and not self.location and not self.coordinates:
             return None
 
-        params = {
-            'format': 'json',
-            'u': 'c' if self.metric else 'f'
-        }
+        params = {'format': 'json', 'u': 'c' if self.metric else 'f'}
 
         if self.woeid:
             params['woeid'] = self.woeid
@@ -186,7 +178,7 @@ class YahooWeather(GenPollUrl):
             'oauth_signature_method': 'PLAINTEXT',
             'oauth_timestamp': str(int(time.time())),
             'oauth_version': '1.0',
-            'oauth_signature': CONSUMER_SECRET
+            'oauth_signature': CONSUMER_SECRET,
         }
         params.update(oauth)
 
@@ -204,6 +196,7 @@ class YahooWeather(GenPollUrl):
                     __inner(_json[i], name + str(i) + '_')
             else:
                 out[name[:-1]] = _json
+
         __inner(obj)
         return out
 
@@ -264,7 +257,7 @@ class YahooWeather(GenPollUrl):
         }
         data['current_observation_condition_symbol'] = condition_mapping.get(
             data['current_observation_condition_code'],
-            data['current_observation_condition_text']
+            data['current_observation_condition_text'],
         )
 
         if data['current_observation_atmosphere_rising'] == '0':

@@ -28,7 +28,11 @@ class WindowList(Dmenu):
 
     defaults = [
         ("item_format", "{group}.{id}: {window}", "the format for the menu items"),
-        ("all_groups", True, "If True, list windows from all groups; otherwise only from the current group"),
+        (
+            "all_groups",
+            True,
+            "If True, list windows from all groups; otherwise only from the current group",
+        ),
         ("dmenu_lines", "80", "Give lines vertically. Set to None get inline"),
     ]
 
@@ -51,7 +55,8 @@ class WindowList(Dmenu):
         for win in windows:
             if win.group:
                 item = self.item_format.format(
-                    group=win.group.label or win.group.name, id=id, window=win.name)
+                    group=win.group.label or win.group.name, id=id, window=win.name
+                )
                 self.item_to_win[item] = win
                 id += 1
 

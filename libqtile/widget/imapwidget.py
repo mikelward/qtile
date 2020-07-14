@@ -64,6 +64,7 @@ class ImapWidget(base.ThreadedPollText):
 
     .. _keyring: https://pypi.org/project/keyring/
     """
+
     orientations = base.ORIENTATION_HORIZONTAL
     defaults = [
         ('mbox', '"INBOX"', 'mailbox to fetch'),
@@ -89,6 +90,10 @@ class ImapWidget(base.ThreadedPollText):
             im.login(self.user, self.password)
             status, response = im.status(self.mbox, '(UNSEEN)')
             self.text = response[0].decode()
-            self.text = self.label + ': ' + re.sub(r'\).*$', '', re.sub(r'^.*N\s', '', self.text))
+            self.text = (
+                self.label
+                + ': '
+                + re.sub(r'\).*$', '', re.sub(r'^.*N\s', '', self.text))
+            )
             im.logout()
         return self.text

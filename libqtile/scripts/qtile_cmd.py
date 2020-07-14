@@ -40,7 +40,9 @@ from libqtile.command_interface import (
 from libqtile.ipc import Client, find_sockfile
 
 
-def get_formated_info(obj: InteractiveCommandClient, cmd: str, args=True, short=True) -> str:
+def get_formated_info(
+    obj: InteractiveCommandClient, cmd: str, args=True, short=True
+) -> str:
     """Get documentation for command/function and format it.
 
     Returns:
@@ -60,7 +62,7 @@ def get_formated_info(obj: InteractiveCommandClient, cmd: str, args=True, short=
 
     if doc is not None:
         tdoc = doc[0]
-        doc_args = tdoc[tdoc.find("(") + 1:tdoc.find(")")].strip()
+        doc_args = tdoc[tdoc.find("(") + 1 : tdoc.find(")")].strip()
 
         short_description = doc[1] if len(doc) > 1 else ""
 
@@ -106,7 +108,9 @@ def print_commands(prefix: str, obj: InteractiveCommandClient) -> None:
         print(formating.format(line[0], line[1]))
 
 
-def get_object(client: InteractiveCommandClient, argv: List[str]) -> InteractiveCommandClient:
+def get_object(
+    client: InteractiveCommandClient, argv: List[str]
+) -> InteractiveCommandClient:
     """
     Constructs a path to object and returns given object (if it exists).
     """
@@ -135,7 +139,9 @@ def get_object(client: InteractiveCommandClient, argv: List[str]) -> Interactive
     return client
 
 
-def run_function(client: InteractiveCommandClient, funcname: str, args: List[str]) -> str:
+def run_function(
+    client: InteractiveCommandClient, funcname: str, args: List[str]
+) -> str:
     "Run command with specified args on given object."
     try:
         func = getattr(client, funcname)
@@ -149,8 +155,11 @@ def run_function(client: InteractiveCommandClient, funcname: str, args: List[str
         print("error: Sorry command '{}' cannot be found".format(funcname))
         sys.exit(1)
     except CommandException:
-        print("error: Sorry cannot run function '{}' with arguments {}"
-              .format(funcname, args))
+        print(
+            "error: Sorry cannot run function '{}' with arguments {}".format(
+                funcname, args
+            )
+        )
         sys.exit(1)
 
     return ret
@@ -158,8 +167,7 @@ def run_function(client: InteractiveCommandClient, funcname: str, args: List[str
 
 def print_base_objects() -> None:
     """Prints access objects of Client, use cmd for commands."""
-    actions = ["-o cmd", "-o window", "-o layout", "-o group", "-o bar",
-               "-o screen"]
+    actions = ["-o cmd", "-o window", "-o layout", "-o group", "-o bar", "-o screen"]
     print("Specify an object on which to execute command")
     print("\n".join(actions))
 
@@ -167,31 +175,46 @@ def print_base_objects() -> None:
 def main() -> None:
     "Runs tool according to specified arguments."
     description = 'Simple tool to expose qtile.command functionality to shell.'
-    epilog = textwrap.dedent('''\
+    epilog = textwrap.dedent(
+        '''\
     Examples:
      qtile-cmd
      qtile-cmd -o cmd
      qtile-cmd -o cmd -f prev_layout -i
      qtile-cmd -o cmd -f prev_layout -a 3 # prev_layout on group 3
-     qtile-cmd -o group 3 -f focus_back''')
+     qtile-cmd -o group 3 -f focus_back'''
+    )
     fmt = argparse.RawDescriptionHelpFormatter
 
-    parser = argparse.ArgumentParser(description=description, epilog=epilog,
-                                     formatter_class=fmt)
-    parser.add_argument('--object', '-o', dest='obj_spec', nargs='+',
-                        help='Specify path to object (space separated).  '
-                             'If no --function flag display available commands.  '
-                             'Use `cmd` to specify root command.')
-    parser.add_argument('--function', '-f', default="help",
-                        help='Select function to execute.')
-    parser.add_argument('--args', '-a', nargs='+', default=[],
-                        help='Set arguments supplied to function.')
-    parser.add_argument('--info', '-i', action='store_true',
-                        help='With both --object and --function args prints documentation for function.')
-    parser.add_argument(
-        "--socket", "-s",
-        help='Path of the Qtile IPC socket.'
+    parser = argparse.ArgumentParser(
+        description=description, epilog=epilog, formatter_class=fmt
     )
+    parser.add_argument(
+        '--object',
+        '-o',
+        dest='obj_spec',
+        nargs='+',
+        help='Specify path to object (space separated).  '
+        'If no --function flag display available commands.  '
+        'Use `cmd` to specify root command.',
+    )
+    parser.add_argument(
+        '--function', '-f', default="help", help='Select function to execute.'
+    )
+    parser.add_argument(
+        '--args',
+        '-a',
+        nargs='+',
+        default=[],
+        help='Set arguments supplied to function.',
+    )
+    parser.add_argument(
+        '--info',
+        '-i',
+        action='store_true',
+        help='With both --object and --function args prints documentation for function.',
+    )
+    parser.add_argument("--socket", "-s", help='Path of the Qtile IPC socket.')
     args = parser.parse_args()
 
     if args.obj_spec:

@@ -57,13 +57,13 @@ class Wlan(base.InLoopPollText):
         (
             'disconnected_message',
             'Disconnected',
-            'String to show when the wlan is diconnected.'
+            'String to show when the wlan is diconnected.',
         ),
         (
             'format',
             '{essid} {quality}/70',
-            'Display format. For percents you can use "{essid} {percent:2.0%}"'
-        )
+            'Display format. For percents you can use "{essid} {percent:2.0%}"',
+        ),
     ]
 
     def __init__(self, **config):
@@ -78,12 +78,11 @@ class Wlan(base.InLoopPollText):
                 return self.disconnected_message
 
             return self.format.format(
-                essid=essid,
-                quality=quality,
-                percent=(quality / 70)
+                essid=essid, quality=quality, percent=(quality / 70)
             )
         except EnvironmentError:
             logger.error(
                 '%s: Probably your wlan device is switched off or '
                 ' otherwise not present in your system.',
-                self.__class__.__name__)
+                self.__class__.__name__,
+            )
