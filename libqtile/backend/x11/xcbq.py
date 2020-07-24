@@ -278,7 +278,11 @@ class AtomCache:
     def insert(self, name=None, atom=None):
         assert name or atom
         if atom is None:
-            c = self.conn.conn.core.InternAtom(False, len(name), name)
+            c = self.conn.conn.core.InternAtom(
+                only_if_exists=False,
+                name_len=len(name),
+                name=name
+            )
             atom = c.reply().atom
         if name is None:
             c = self.conn.conn.core.GetAtomName(atom)
@@ -339,7 +343,7 @@ class Colormap:
         """
         try:
             return self.conn.conn.core.AllocNamedColor(
-                self.cid, len(color), color
+                cmap=self.cid, name_len=len(color), name=color
             ).reply()
         except xcffib.xproto.NameError:
 
@@ -348,7 +352,8 @@ class Colormap:
             r = x8to16(int(color[-6] + color[-5], 16))
             g = x8to16(int(color[-4] + color[-3], 16))
             b = x8to16(int(color[-2] + color[-1], 16))
-            return self.conn.conn.core.AllocColor(self.cid, r, g, b).reply()
+            return self.conn.conn.core.AllocColor(
+                cmap=self.cid, red=r, green=g, blue=b).reply()
 
 
 class Xinerama:
@@ -456,25 +461,34 @@ class Window:
         return r.value.to_utf8()
 
     def send_event(self, synthevent, mask=EventMask.NoEvent):
-        self.conn.conn.core.SendEvent(False, self.wid, mask, synthevent.pack())
+        self.conn.conn.core.SendEvent(
+            propagate=False,
+            destination=self.wid,
+            event_mask=mask,
+            event=synthevent.pack(),
+        )
 
     def kill_client(self):
         self.conn.conn.core.KillClient(self.wid)
 
     def set_input_focus(self):
         self.conn.conn.core.SetInputFocus(
-            xcffib.xproto.InputFocus.PointerRoot,
-            self.wid,
-            xcffib.xproto.Time.CurrentTime
+            revert_to=xcffib.xproto.InputFocus.PointerRoot,
+            focus=self.wid,
+            time=xcffib.xproto.Time.CurrentTime,
         )
 
     def warp_pointer(self, x, y):
         """Warps the pointer to the location `x`, `y` on the window"""
         self.conn.conn.core.WarpPointer(
-            src_window=0, dst_window=self.wid,
-            src_x=0, src_y=0,
-            src_width=0, src_height=0,
-            dest_x=x, dest_y=y
+            src_window=0,
+            dst_window=self.wid,
+            src_x=0,
+            src_y=0,
+            src_width=0,
+            src_height=0,
+            dest_x=x,
+            dest_y=y,
         )
 
     def get_name(self):
@@ -626,19 +640,21 @@ class Window:
         # since 1.12, uses switches to pack things sensibly
         if float(xcffib.__xcb_proto_version__) < 1.12:
             values = [i & 0xffffffff for i in values]
-        return self.conn.conn.core.ConfigureWindow(self.wid, mask, values)
+        return self.conn.conn.core.ConfigureWindow(
+            window=self.wid, value_mask=mask, value_list=values
+        )
 
     def set_attribute(self, **kwargs):
         mask, values = AttributeMasks(**kwargs)
         self.conn.conn.core.ChangeWindowAttributesChecked(
-            self.wid, mask, values
+            window=self.wid, value_mask=mask, value_list=values
         )
 
     def set_cursor(self, name):
         cursor_id = self.conn.cursors[name]
         mask, values = AttributeMasks(cursor=cursor_id)
         self.conn.conn.core.ChangeWindowAttributesChecked(
-            self.wid, mask, values
+            window=self.wid, value_mask=mask, value_list=values
         )
 
     def set_property(self, name, value, type=None, format=None):
@@ -678,13 +694,13 @@ class Window:
 
         try:
             self.conn.conn.core.ChangePropertyChecked(
-                xcffib.xproto.PropMode.Replace,
-                self.wid,
-                self.conn.atoms[name],
-                self.conn.atoms[type],
-                format,  # Format - 8, 16, 32
-                len(value),
-                value
+                mode=xcffib.xproto.PropMode.Replace,
+                window=self.wid,
+                property=self.conn.atoms[name],
+                type=self.conn.atoms[type],
+                format=format,  # Format - 8, 16, 32
+                data_len=len(value),
+                data=value,
             ).check()
         except xcffib.xproto.WindowError:
             logger.debug(
@@ -707,14 +723,12 @@ class Window:
 
         try:
             r = self.conn.conn.core.GetProperty(
-                False, self.wid,
-                self.conn.atoms[prop]
-                if isinstance(prop, str)
-                else prop,
-                self.conn.atoms[type]
-                if isinstance(type, str)
-                else type,
-                0, (2 ** 32) - 1
+                delete=False,
+                window=self.wid,
+                property=self.conn.atoms[prop] if isinstance(prop, str) else prop,
+                type=self.conn.atoms[type] if isinstance(type, str) else type,
+                long_offset=0,
+                long_length=(2 ** 32) - 1,
             ).reply()
         except (xcffib.xproto.WindowError, xcffib.xproto.AccessError):
             logger.debug(
@@ -772,7 +786,11 @@ class Font:
 
     def text_extents(self, s):
         s += "aaa"
-        x = self.conn.conn.core.QueryTextExtents(self.fid, len(s), s).reply()
+        x = self.conn.conn.core.QueryTextExtents(
+            font=self.fid,
+            string_len=len(s),
+            string=s,
+        ).reply()
         return x
 
 
@@ -877,17 +895,21 @@ class Connection:
     def create_window(self, x, y, width, height):
         wid = self.conn.generate_id()
         self.conn.core.CreateWindow(
-            self.default_screen.root_depth,
-            wid,
-            self.default_screen.root.wid,
-            x, y, width, height, 0,
-            WindowClass.InputOutput,
-            self.default_screen.root_visual,
-            CW.BackPixel | CW.EventMask,
-            [
+            depth=self.default_screen.root_depth,
+            wid=wid,
+            parent=self.default_screen.root.wid,
+            x=x,
+            y=y,
+            width=width,
+            height=height,
+            border_width=0,
+            _class=WindowClass.InputOutput,
+            visual=self.default_screen.root_visual,
+            value_mask=CW.BackPixel | CW.EventMask,
+            value_list=[
                 self.default_screen.black_pixel,
                 EventMask.StructureNotify | EventMask.Exposure
-            ]
+            ],
         )
         return Window(self, wid)
 
@@ -916,7 +938,7 @@ class Connection:
 
     def open_font(self, name):
         fid = self.conn.generate_id()
-        self.conn.core.OpenFont(fid, len(name), name)
+        self.conn.core.OpenFont(fid=fid, name_len=len(name), name=name)
         return Font(self, fid)
 
     def extensions(self):
@@ -934,9 +956,9 @@ class Connection:
         window = self.conn.core.GetInputFocus().reply().focus
         if window == xcffib.xproto.InputFocus._None:
             self.conn.core.SetInputFocus(
-                xcffib.xproto.InputFocus.PointerRoot,
-                xcffib.xproto.InputFocus.PointerRoot,
-                xcffib.xproto.Time.CurrentTime,
+                revert_to=xcffib.xproto.InputFocus.PointerRoot,
+                focus=xcffib.xproto.InputFocus.PointerRoot,
+                time=xcffib.xproto.Time.CurrentTime,
             )
 
 
@@ -969,11 +991,11 @@ class Painter:
         else:
             root_pixmap = self.conn.generate_id()
             self.conn.core.CreatePixmap(
-                self.default_screen.root_depth,
-                root_pixmap,
-                self.default_screen.root.wid,
-                self.default_screen.width_in_pixels,
-                self.default_screen.height_in_pixels,
+                depth=self.default_screen.root_depth,
+                pid=root_pixmap,
+                drawable=self.default_screen.root.wid,
+                width=self.default_screen.width_in_pixels,
+                height=self.default_screen.height_in_pixels,
             )
 
         for depth in self.default_screen.allowed_depths:
@@ -1013,27 +1035,35 @@ class Painter:
             context.paint()
 
         self.conn.core.ChangeProperty(
-            xcffib.xproto.PropMode.Replace,
-            self.default_screen.root.wid,
-            self.atoms['_XROOTPMAP_ID'],
-            xcffib.xproto.Atom.PIXMAP,
-            32, 1, [root_pixmap]
+            mode=xcffib.xproto.PropMode.Replace,
+            window=self.default_screen.root.wid,
+            property=self.atoms['_XROOTPMAP_ID'],
+            type=xcffib.xproto.Atom.PIXMAP,
+            format=32,
+            data_len=1,
+            data=[root_pixmap],
         )
         self.conn.core.ChangeProperty(
-            xcffib.xproto.PropMode.Replace,
-            self.default_screen.root.wid,
-            self.atoms['ESETROOT_PMAP_ID'],
-            xcffib.xproto.Atom.PIXMAP,
-            32, 1, [root_pixmap]
+            mode=xcffib.xproto.PropMode.Replace,
+            window=self.default_screen.root.wid,
+            property=self.atoms['ESETROOT_PMAP_ID'],
+            type=xcffib.xproto.Atom.PIXMAP,
+            format=32,
+            data_len=1,
+            data=[root_pixmap],
         )
         self.conn.core.ChangeWindowAttributes(
-            self.default_screen.root.wid,
-            xcffib.xproto.CW.BackPixmap, [root_pixmap]
+            window=self.default_screen.root.wid,
+            value_mask=xcffib.xproto.CW.BackPixmap,
+            value_list=[root_pixmap],
         )
         self.conn.core.ClearArea(
-            0, self.default_screen.root.wid, 0, 0,
-            self.default_screen.width_in_pixels,
-            self.default_screen.height_in_pixels
+            exposures=0,
+            window=self.default_screen.root.wid,
+            x=0,
+            y=0,
+            width=self.default_screen.width_in_pixels,
+            height=self.default_screen.height_in_pixels,
         )
         self.conn.flush()
 
